@@ -28,6 +28,7 @@ class MainLayout(private  val context : Context) {
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT
             )
+            setBackgroundColor(Color.WHITE)
         }
         topTabBar.apply {
             layoutParams = ConstraintLayout.LayoutParams(
