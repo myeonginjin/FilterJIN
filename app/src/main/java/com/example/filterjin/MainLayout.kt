@@ -1,0 +1,141 @@
+package com.example.filterjin
+
+import android.content.Context
+import android.graphics.Color
+import android.view.ViewGroup
+import android.widget.Button
+import android.widget.ImageView
+import android.widget.Toast
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.constraintlayout.widget.ConstraintSet
+
+class MainLayout(private  val context : Context) {
+
+    val mainFrame = ConstraintLayout(context)
+
+
+    fun getMainLayout() : ConstraintLayout{
+
+        mainFrame.apply {
+            layoutParams = ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT
+            )
+        }
+        val topTabBar = ConstraintLayout(context).apply {
+            layoutParams = ConstraintLayout.LayoutParams(
+                ConstraintLayout.LayoutParams.MATCH_PARENT,
+                ConstraintLayout.LayoutParams.WRAP_CONTENT
+            )
+            id = ConstraintLayout.generateViewId()
+        }
+        mainFrame.addView(topTabBar)
+
+        val galleryBtn = Button(context).apply {
+            text = "Gallery"
+            layoutParams = ConstraintLayout.LayoutParams(
+                ConstraintLayout.LayoutParams.WRAP_CONTENT,
+                ConstraintLayout.LayoutParams.WRAP_CONTENT
+            )
+            id = ConstraintLayout.generateViewId()
+        }
+        topTabBar.addView(galleryBtn)
+
+
+        val toggleFilterBtn = Button(context).apply {
+            text = "toggle"
+            layoutParams = ConstraintLayout.LayoutParams(
+                ConstraintLayout.LayoutParams.WRAP_CONTENT,
+                ConstraintLayout.LayoutParams.WRAP_CONTENT
+            )
+            id = ConstraintLayout.generateViewId()
+        }
+        topTabBar.addView(toggleFilterBtn)
+
+        val saveBtn = Button(context).apply {
+            text = "Save"
+            layoutParams = ConstraintLayout.LayoutParams(
+                ConstraintLayout.LayoutParams.WRAP_CONTENT,
+                ConstraintLayout.LayoutParams.WRAP_CONTENT
+            )
+            id = ConstraintLayout.generateViewId()
+        }
+        topTabBar.addView(saveBtn)
+
+        val imageView = ImageView(context).apply {
+            setImageResource(R.drawable.ic_launcher_background)
+            layoutParams = ConstraintLayout.LayoutParams(
+                ConstraintLayout.LayoutParams.WRAP_CONTENT,
+                ConstraintLayout.LayoutParams.WRAP_CONTENT
+            )
+            id = ConstraintLayout.generateViewId()
+        }
+        mainFrame.addView(imageView)
+
+        ConstraintSet().apply {
+            clone(mainFrame)
+
+
+            connect(topTabBar.id, ConstraintSet.TOP, ConstraintSet.PARENT_ID, ConstraintSet.TOP,16)
+
+
+            applyTo(mainFrame)
+        }
+
+
+        ConstraintSet().apply {
+            clone(topTabBar)
+
+            connect(galleryBtn.id, ConstraintSet.START, ConstraintSet.PARENT_ID, ConstraintSet.START, 16)
+
+
+            connect(saveBtn.id, ConstraintSet.END, ConstraintSet.PARENT_ID, ConstraintSet.END, 16)
+
+
+            connect(toggleFilterBtn.id, ConstraintSet.END, saveBtn.id, ConstraintSet.START, 16)
+
+
+            applyTo(topTabBar)
+
+        }
+
+        ConstraintSet().apply {
+            clone(mainFrame)
+
+            connect(imageView.id, ConstraintSet.TOP, ConstraintSet.PARENT_ID, ConstraintSet.TOP, 8)
+            connect(imageView.id, ConstraintSet.BOTTOM, ConstraintSet.PARENT_ID, ConstraintSet.BOTTOM, 8)
+            connect(imageView.id, ConstraintSet.START, ConstraintSet.PARENT_ID, ConstraintSet.START,8)
+            connect(imageView.id, ConstraintSet.END, ConstraintSet.PARENT_ID, ConstraintSet.END, 8)
+
+
+            applyTo(mainFrame)
+        }
+
+
+
+        galleryBtn.setOnClickListener {
+
+            Toast.makeText(context, "galleryBtn tapped", Toast.LENGTH_SHORT).show()
+
+
+        }
+        toggleFilterBtn.setOnClickListener {
+
+            Toast.makeText(context, "toggleFilterBtn tapped", Toast.LENGTH_SHORT).show()
+
+
+        }
+        saveBtn.setOnClickListener {
+
+            Toast.makeText(context, "saveBtn tapped", Toast.LENGTH_SHORT).show()
+
+
+        }
+
+
+
+        return  mainFrame
+    }
+
+
+}
