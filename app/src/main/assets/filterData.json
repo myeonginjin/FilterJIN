@@ -1,0 +1,21 @@
+[
+  {
+    "id" : 1,
+    "name" : "GrayScale",
+    "category" : "Basic",
+    "imagePath" : "assests/userImg"
+
+  },
+  {
+    "id" : 2,
+    "name" : "Lovely",
+    "category" : "Basic",
+    "imagePath" : "assests/userImg"
+  },
+  {
+    "id" : 3,
+    "name" : "GrayScale",
+    "category" : "Basic",
+    "imagePath" : "assests/userImg"
+  }
+]

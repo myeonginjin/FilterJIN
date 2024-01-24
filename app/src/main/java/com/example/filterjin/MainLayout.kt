@@ -8,10 +8,17 @@ import android.widget.ImageView
 import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
+import androidx.recyclerview.widget.RecyclerView
 
 class MainLayout(private  val context : Context) {
 
-    val mainFrame = ConstraintLayout(context)
+    private val mainFrame = ConstraintLayout(context)
+    private val topTabBar = ConstraintLayout(context)
+    private val galleryBtn = Button(context)
+    private val toggleFilterBtn = Button(context)
+    private val saveBtn = Button(context)
+    private val imageView = ImageView(context)
+    private val editBar = ListViewManager(context).getEditBar()
 
 
     fun getMainLayout() : ConstraintLayout{
@@ -22,7 +29,7 @@ class MainLayout(private  val context : Context) {
                 ViewGroup.LayoutParams.MATCH_PARENT
             )
         }
-        val topTabBar = ConstraintLayout(context).apply {
+        topTabBar.apply {
             layoutParams = ConstraintLayout.LayoutParams(
                 ConstraintLayout.LayoutParams.MATCH_PARENT,
                 ConstraintLayout.LayoutParams.WRAP_CONTENT
@@ -31,7 +38,7 @@ class MainLayout(private  val context : Context) {
         }
         mainFrame.addView(topTabBar)
 
-        val galleryBtn = Button(context).apply {
+        galleryBtn.apply {
             text = "Gallery"
             layoutParams = ConstraintLayout.LayoutParams(
                 ConstraintLayout.LayoutParams.WRAP_CONTENT,
@@ -42,7 +49,7 @@ class MainLayout(private  val context : Context) {
         topTabBar.addView(galleryBtn)
 
 
-        val toggleFilterBtn = Button(context).apply {
+        toggleFilterBtn.apply {
             text = "toggle"
             layoutParams = ConstraintLayout.LayoutParams(
                 ConstraintLayout.LayoutParams.WRAP_CONTENT,
@@ -52,7 +59,7 @@ class MainLayout(private  val context : Context) {
         }
         topTabBar.addView(toggleFilterBtn)
 
-        val saveBtn = Button(context).apply {
+        saveBtn.apply {
             text = "Save"
             layoutParams = ConstraintLayout.LayoutParams(
                 ConstraintLayout.LayoutParams.WRAP_CONTENT,
@@ -62,8 +69,8 @@ class MainLayout(private  val context : Context) {
         }
         topTabBar.addView(saveBtn)
 
-        val imageView = ImageView(context).apply {
-            setImageResource(R.drawable.ic_launcher_background)
+        imageView.apply {
+            setImageResource(R.drawable.test)
             layoutParams = ConstraintLayout.LayoutParams(
                 ConstraintLayout.LayoutParams.WRAP_CONTENT,
                 ConstraintLayout.LayoutParams.WRAP_CONTENT
@@ -71,6 +78,11 @@ class MainLayout(private  val context : Context) {
             id = ConstraintLayout.generateViewId()
         }
         mainFrame.addView(imageView)
+
+        editBar.apply {
+            id = ConstraintLayout.generateViewId()
+        }
+        mainFrame.addView(editBar)
 
         ConstraintSet().apply {
             clone(mainFrame)
@@ -106,6 +118,17 @@ class MainLayout(private  val context : Context) {
             connect(imageView.id, ConstraintSet.BOTTOM, ConstraintSet.PARENT_ID, ConstraintSet.BOTTOM, 8)
             connect(imageView.id, ConstraintSet.START, ConstraintSet.PARENT_ID, ConstraintSet.START,8)
             connect(imageView.id, ConstraintSet.END, ConstraintSet.PARENT_ID, ConstraintSet.END, 8)
+
+
+            applyTo(mainFrame)
+        }
+
+        ConstraintSet().apply {
+            clone(mainFrame)
+
+            connect(editBar.id, ConstraintSet.TOP, imageView.id, ConstraintSet.BOTTOM, 100)
+            connect(editBar.id, ConstraintSet.START, ConstraintSet.PARENT_ID, ConstraintSet.START,8)
+            connect(editBar.id, ConstraintSet.END, ConstraintSet.PARENT_ID, ConstraintSet.END, 8)
 
 
             applyTo(mainFrame)
