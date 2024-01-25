@@ -1,12 +1,14 @@
 package com.example.filterjin
 
+import android.graphics.Bitmap
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 
-class FilterAdapter (val filterItemList : ArrayList<FilterItem>):
+class FilterAdapter(val filterItemList: List<FilterItem>):
     RecyclerView.Adapter<FilterAdapter.FilterViewHolder>() {
 
     interface OnItemClickListener {
@@ -21,6 +23,7 @@ class FilterAdapter (val filterItemList : ArrayList<FilterItem>):
     override fun onBindViewHolder(holder: FilterViewHolder, position: Int) {
         holder.tv_time.text = filterItemList[position].id.toString()
         holder.tv_title.text = filterItemList[position].name
+        holder.tv_img.setImageResource(filterItemList[position].thumbnail)
         holder.tv_name.text = filterItemList[position].imagePath
     }
 
@@ -32,6 +35,7 @@ class FilterAdapter (val filterItemList : ArrayList<FilterItem>):
     inner class FilterViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val tv_time = itemView.findViewById<TextView>(R.id.tv_time)
         val tv_title = itemView.findViewById<TextView>(R.id.tv_title)
+        val tv_img = itemView.findViewById<ImageView>(R.id.userImg)
         val tv_name = itemView.findViewById<TextView>(R.id.tv_name)
 
         init {
@@ -45,4 +49,7 @@ class FilterAdapter (val filterItemList : ArrayList<FilterItem>):
         }
 
     }
+
 }
+
+

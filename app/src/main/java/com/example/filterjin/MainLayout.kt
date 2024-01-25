@@ -1,16 +1,27 @@
 package com.example.filterjin
 
+import android.app.Activity
 import android.content.Context
+import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.Color
+import android.net.Uri
+import android.util.Log
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.Toast
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.recyclerview.widget.RecyclerView
 
-class MainLayout(private  val context : Context) {
+class MainLayout(
+    private val context: Context,
+    private val galleryLauncher: ActivityResultLauncher<Intent>?
+) {
 
     private val mainFrame = ConstraintLayout(context)
     private val topTabBar = ConstraintLayout(context)
@@ -18,7 +29,29 @@ class MainLayout(private  val context : Context) {
     private val toggleFilterBtn = Button(context)
     private val saveBtn = Button(context)
     private val imageView = ImageView(context)
-    private val editBar = ListViewManager(context).getEditBar()
+    private val editBar = ListViewManager(context, this).getEditBar()
+    private var bitmap : Bitmap? = null
+
+
+    fun loadImage(uri: Uri?) {
+        // imageView에 이미지 설정
+        val inputStream = uri?.let { context.contentResolver.openInputStream(it) }
+        bitmap = BitmapFactory.decodeStream(inputStream)
+        Log.i("?","test1234455678823982012308120381203218 $bitmap")
+
+
+        imageView.setImageBitmap(bitmap)
+    }
+
+    fun getImage() : Bitmap? {
+        Log.i("!!!","888888888888888\n\n\n\n\n\n\n $bitmap")
+        return bitmap
+    }
+
+    fun setImage(img : Bitmap) {
+        imageView.setImageBitmap(img)
+    }
+
 
 
     fun getMainLayout() : ConstraintLayout{
@@ -73,8 +106,8 @@ class MainLayout(private  val context : Context) {
         imageView.apply {
             setImageResource(R.drawable.test)
             layoutParams = ConstraintLayout.LayoutParams(
-                ConstraintLayout.LayoutParams.WRAP_CONTENT,
-                ConstraintLayout.LayoutParams.WRAP_CONTENT
+                1000,
+                1000
             )
             id = ConstraintLayout.generateViewId()
         }
@@ -138,23 +171,26 @@ class MainLayout(private  val context : Context) {
 
 
         galleryBtn.setOnClickListener {
-
-            Toast.makeText(context, "galleryBtn tapped", Toast.LENGTH_SHORT).show()
-
-
+            val intent = Intent(Intent.ACTION_PICK)
+            intent.type = "image/*"
+            galleryLauncher!!.launch(intent) // MainActivity에서 받은 launcher 사용
         }
-        toggleFilterBtn.setOnClickListener {
-
-            Toast.makeText(context, "toggleFilterBtn tapped", Toast.LENGTH_SHORT).show()
 
 
-        }
+
+
         saveBtn.setOnClickListener {
 
             Toast.makeText(context, "saveBtn tapped", Toast.LENGTH_SHORT).show()
 
-
         }
+
+
+
+
+
+
+
 
 
 

@@ -2,20 +2,42 @@
   {
     "id" : 1,
     "name" : "GrayScale",
-    "category" : "Basic",
-    "imagePath" : "assests/userImg"
+    "rRatio" : 0.2126,
+    "gRatio" : 0.7152,
+    "bRatio" : 0.0722,
+    "imagePath" : "assests/img1"
 
   },
   {
     "id" : 2,
     "name" : "Lovely",
-    "category" : "Basic",
-    "imagePath" : "assests/userImg"
+    "rRatio" : 0.2126,
+    "gRatio" : 0.7152,
+    "bRatio" : 0.0722,
+    "imagePath" : "assests/img2"
   },
   {
     "id" : 3,
-    "name" : "GrayScale",
-    "category" : "Basic",
-    "imagePath" : "assests/userImg"
+    "name" : "Toko",
+    "rRatio" : 0.2126,
+    "gRatio" : 0.7152,
+    "bRatio" : 0.0722,
+    "imagePath" : "assests/img3"
+  },
+  {
+    "id" : 4,
+    "name" : "Paris",
+    "rRatio" : 0.2126,
+    "gRatio" : 0.7152,
+    "bRatio" : 0.0722,
+    "imagePath" : "assests/img4"
+  },
+  {
+    "id" : 5,
+    "name" : "Sepia",
+    "rRatio" : 0.2126,
+    "gRatio" : 0.7152,
+    "bRatio" : 0.0722,
+    "imagePath" : "assests/img5"
   }
 ]
