@@ -2,20 +2,27 @@
   {
     "id" : 1,
     "name" : "GrayScale",
-    "category" : "Basic",
-    "imagePath" : "assests/userImg"
+    "imagePath" : "assests/img1"
 
   },
   {
     "id" : 2,
     "name" : "Lovely",
-    "category" : "Basic",
-    "imagePath" : "assests/userImg"
+    "imagePath" : "assests/img2"
   },
   {
     "id" : 3,
-    "name" : "GrayScale",
-    "category" : "Basic",
-    "imagePath" : "assests/userImg"
+    "name" : "Toko",
+    "imagePath" : "assests/img3"
+  },
+  {
+    "id" : 4,
+    "name" : "Paris",
+    "imagePath" : "assests/img4"
+  },
+  {
+    "id" : 5,
+    "name" : "Sepia",
+    "imagePath" : "assests/img5"
   }
 ]
