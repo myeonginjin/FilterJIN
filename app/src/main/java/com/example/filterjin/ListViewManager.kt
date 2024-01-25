@@ -40,7 +40,7 @@ class ListViewManager (private val context : Context,  private val mainLayout: M
                 if (item.name=="GrayScale"){
                     val bitmapImg = mainLayout.getImage()
                     Log.i("?","wqodhqwodjqwodjqwpodjwqpdjwqpdjq $bitmapImg")
-                    val newBitmapImg = bitmapImg?.let { applyGrayScaleFilter(it) }
+                    val newBitmapImg = bitmapImg?.let { applyGrayScaleFilter(it , item.rRatio,item.bRatio, item.gRatio ) }
 
                     newBitmapImg?.let { mainLayout.setImage(it) }
 
@@ -51,7 +51,7 @@ class ListViewManager (private val context : Context,  private val mainLayout: M
 
     }
 
-    private fun applyGrayScaleFilter(originalBitmap : Bitmap) : Bitmap{
+    private fun applyGrayScaleFilter(originalBitmap : Bitmap, rRatio:Double, gRatio:Double, bRatio:Double) : Bitmap{
         // Get the width and height of the bitmap
         val width: Int = originalBitmap.width
         val height: Int = originalBitmap.height
@@ -64,9 +64,9 @@ class ListViewManager (private val context : Context,  private val mainLayout: M
         originalBitmap.getPixels(pixels, 0, width, 0, 0, width, height)
 
         // Constants for grayscale conversion
-        val rRatio = 0.299
-        val gRatio = 0.587
-        val bRatio = 0.114
+//        val rRatio = 0.299
+//        val gRatio = 0.587
+//        val bRatio = 0.114
 
         // Apply grayscale filter
         for (i in 0 until width * height) {

@@ -21,9 +21,14 @@ class FilterFactory (private val context: Context) {
 
             val id = jsonObject.getInt("id")
             val name = jsonObject.getString("name")
-            val imagePath = jsonObject.getString("imagePath")
+            val rRatio = jsonObject.getDouble ("rRatio")
+            val gRatio = jsonObject.getDouble ("gRatio")
+            val bRatio = jsonObject.getDouble ("bRatio")
+
             val thumbnail  = R.drawable.grayscale_test
-            val filter = FilterItem(id,name, thumbnail , imagePath)
+            val imagePath = jsonObject.getString("imagePath")
+
+            val filter = FilterItem(id,name, thumbnail ,rRatio,gRatio , bRatio, imagePath)
 
             filterList.add(filter)
         }
