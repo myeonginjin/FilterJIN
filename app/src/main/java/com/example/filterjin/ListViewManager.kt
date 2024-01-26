@@ -9,7 +9,7 @@ import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 
-class ListViewManager (private val context : Context,  private val mainLayout: MainLayout) {
+class ListViewManager (private val context : Context,  private val mainLayout: MainLayout , private val imageViewManager : ImageViewManager) {
     private  val editBar = RecyclerView(context)
 
     fun getEditBar() : RecyclerView{
@@ -41,12 +41,12 @@ class ListViewManager (private val context : Context,  private val mainLayout: M
                 Toast.makeText(context, "${item.name} 클릭함", Toast.LENGTH_SHORT).show()
 
                 if (item.name=="GrayScale"){
-                    val bitmapImg = ImageViewManager(context).getCurrentImage()
+                    val bitmapImg = imageViewManager.getCurrentImage()
 
                     val newBitmapImg =
                         applyGrayScaleFilter(bitmapImg, item.rRatio,item.bRatio, item.gRatio )
 
-                    ImageViewManager(context).setCurrentImage(newBitmapImg)
+                    imageViewManager.setCurrentImage(newBitmapImg)
 
                 }
             }

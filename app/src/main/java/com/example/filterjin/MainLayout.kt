@@ -33,7 +33,7 @@ class MainLayout(
     private val imageViewManager = ImageViewManager(context)
 
     //ListViewManager클래스로 RecyclerView 동적구현
-    private val editBar = ListViewManager(context, this).getEditBar()
+    private val editBar = ListViewManager(context, this, imageViewManager).getEditBar()
 
 
     //사용자 기기 갤러리 통해서 받아온 이미지 이미지뷰어에 띄우기
