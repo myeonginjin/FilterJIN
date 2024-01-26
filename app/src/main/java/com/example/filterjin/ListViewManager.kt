@@ -21,15 +21,18 @@ class ListViewManager (private val context : Context,  private val mainLayout: M
             )
         }
 
+        //리싸이클러뷰의 item으로 사용할 data class 데이터타입의 Filter 인스턴스 리스트 받아오기
+        val itemList =  FilterFactory(context).getFilterItemList()
 
-         val itemList =  FilterFactory(context).getFilterItemList()
-
+        //어뎁터에 인스턴스 리스트 보내, 뷰 요소로 사용할 수 있도록 만들기
         val filterAdapter = FilterAdapter(itemList)
 
-        //어댑터와 리사이클러뷰를 갱신
+        //어뎁터와 리싸이클러 뷰 갱신
         filterAdapter.notifyDataSetChanged()
 
         editBar.adapter = filterAdapter
+
+        //리스트가 좌우로 스크롤되도록 지정
         editBar.layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
 
         filterAdapter.itemClickListener = object : FilterAdapter.OnItemClickListener {
@@ -38,11 +41,12 @@ class ListViewManager (private val context : Context,  private val mainLayout: M
                 Toast.makeText(context, "${item.name} 클릭함", Toast.LENGTH_SHORT).show()
 
                 if (item.name=="GrayScale"){
-                    val bitmapImg = mainLayout.getImage()
-                    Log.i("?","wqodhqwodjqwodjqwpodjwqpdjwqpdjq $bitmapImg")
-                    val newBitmapImg = bitmapImg?.let { applyGrayScaleFilter(it , item.rRatio,item.bRatio, item.gRatio ) }
+                    val bitmapImg = ImageViewManager(context).getCurrentImage()
 
-                    newBitmapImg?.let { mainLayout.setImage(it) }
+                    val newBitmapImg =
+                        applyGrayScaleFilter(bitmapImg, item.rRatio,item.bRatio, item.gRatio )
+
+                    ImageViewManager(context).setCurrentImage(newBitmapImg)
 
                 }
             }
