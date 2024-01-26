@@ -28,31 +28,22 @@ class MainLayout(
     private val galleryBtn = Button(context)
     private val toggleFilterBtn = Button(context)
     private val saveBtn = Button(context)
-    private val imageView = ImageView(context)
-    private val editBar = ListViewManager(context, this).getEditBar()
-    private var bitmap : Bitmap? = null
 
 
+    private val imageViewManager = ImageViewManager(context)
+
+    //ListViewManager클래스로 RecyclerView 동적구현
+    private val editBar = ListViewManager(context, this, imageViewManager).getEditBar()
+
+
+    //사용자 기기 갤러리 통해서 받아온 이미지 이미지뷰어에 띄우기
     fun loadImage(uri: Uri?) {
-        // imageView에 이미지 설정
+
         val inputStream = uri?.let { context.contentResolver.openInputStream(it) }
-        bitmap = BitmapFactory.decodeStream(inputStream)
-        Log.i("?","test1234455678823982012308120381203218 $bitmap")
-
-
-        imageView.setImageBitmap(bitmap)
+        //이미지 경로로 비트맵 이미지 객체 생성
+        val bitmap = BitmapFactory.decodeStream(inputStream)
+        imageViewManager.setCurrentImage(bitmap)
     }
-
-    fun getImage() : Bitmap? {
-        Log.i("!!!","888888888888888\n\n\n\n\n\n\n $bitmap")
-        return bitmap
-    }
-
-    fun setImage(img : Bitmap) {
-        imageView.setImageBitmap(img)
-    }
-
-
 
     fun getMainLayout() : ConstraintLayout{
 
@@ -103,14 +94,7 @@ class MainLayout(
         }
         topTabBar.addView(saveBtn)
 
-        imageView.apply {
-            setImageResource(R.drawable.test)
-            layoutParams = ConstraintLayout.LayoutParams(
-                1000,
-                1000
-            )
-            id = ConstraintLayout.generateViewId()
-        }
+        val imageView = imageViewManager.getImageView()
         mainFrame.addView(imageView)
 
         editBar.apply {
@@ -173,7 +157,7 @@ class MainLayout(
         galleryBtn.setOnClickListener {
             val intent = Intent(Intent.ACTION_PICK)
             intent.type = "image/*"
-            galleryLauncher!!.launch(intent) // MainActivity에서 받은 launcher 사용
+            galleryLauncher!!.launch(intent) // ActivityResultLauncher 실행
         }
 
 
