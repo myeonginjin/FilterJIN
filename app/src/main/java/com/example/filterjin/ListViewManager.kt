@@ -36,6 +36,8 @@ class ListViewManager (private val context : Context,  private val mainLayout: M
         editBar.layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
 
         filterAdapter.itemClickListener = object : FilterAdapter.OnItemClickListener {
+
+            //콜백함수 오바라이딩
             override fun onItemClick(position: Int) {
                 val item = itemList[position]
                 Toast.makeText(context, "${item.name} 클릭함", Toast.LENGTH_SHORT).show()

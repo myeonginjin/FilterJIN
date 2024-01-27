@@ -39,7 +39,10 @@ class FilterAdapter(val filterItemList: List<FilterItem>):
         val tv_name = itemView.findViewById<TextView>(R.id.tv_name)
 
         init {
+
             itemView.setOnClickListener {
+
+                //인터페이스인 리스너의 콜백 함수 onItemClick(추상함수) 구현
                 itemClickListener?.onItemClick(adapterPosition)
 
 
