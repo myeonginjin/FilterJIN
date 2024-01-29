@@ -1,5 +1,6 @@
 package com.example.filterjin
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Color
@@ -18,6 +19,7 @@ class ListViewManager (private val context : Context,  private val mainLayout: M
     //어뎁터에 인스턴스 리스트 보내, 뷰 요소로 사용할 수 있도록 만들기
     private val filterAdapter = FilterAdapter(itemList)
 
+    @SuppressLint("NotifyDataSetChanged")
     fun getEditBar() : RecyclerView{
 
         editBar.apply {
@@ -26,9 +28,6 @@ class ListViewManager (private val context : Context,  private val mainLayout: M
                 ViewGroup.LayoutParams.WRAP_CONTENT
             )
         }
-
-
-
 
 
         //어뎁터와 리싸이클러 뷰 갱신
@@ -52,9 +51,11 @@ class ListViewManager (private val context : Context,  private val mainLayout: M
         return  editBar
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     fun setCurrentItemImage (bitmap: Bitmap){
         itemList.forEach { item -> item.updateThumbnail(bitmap)}
 
+        //어뎁터와 리싸이클러 뷰 갱신
         filterAdapter.notifyDataSetChanged()
     }
 }
