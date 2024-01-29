@@ -8,10 +8,6 @@ import android.util.Log
 
 object ImageProcessor {
 
-
-    fun printMsg(msg: String) {
-        Log.d("MySingleton", "msg: $msg")
-    }
     fun applyGrayScaleFilter(originalBitmap : Bitmap, rRatio:Double, gRatio:Double, bRatio:Double) : Bitmap {
         // Get the width and height of the bitmap
         val width: Int = originalBitmap.width
