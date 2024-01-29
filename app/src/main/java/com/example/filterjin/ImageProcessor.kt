@@ -20,11 +20,6 @@ object ImageProcessor {
         val pixels: IntArray = IntArray(width * height)
         originalBitmap.getPixels(pixels, 0, width, 0, 0, width, height)
 
-        // Constants for grayscale conversion
-//        val rRatio = 0.299
-//        val gRatio = 0.587
-//        val bRatio = 0.114
-
         // Apply grayscale filter
         for (i in 0 until width * height) {
             val pixel = pixels[i]
