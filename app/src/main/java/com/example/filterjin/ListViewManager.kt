@@ -12,6 +12,12 @@ import androidx.recyclerview.widget.RecyclerView
 class ListViewManager (private val context : Context,  private val mainLayout: MainLayout , private val imageViewManager : ImageViewManager) {
     private  val editBar = RecyclerView(context)
 
+    //리싸이클러뷰의 item으로 사용할 data class 데이터타입의 Filter 인스턴스 리스트 받아오기
+    private val itemList =  FilterFactory(context).getFilterItemList()
+
+    //어뎁터에 인스턴스 리스트 보내, 뷰 요소로 사용할 수 있도록 만들기
+    private val filterAdapter = FilterAdapter(itemList)
+
     fun getEditBar() : RecyclerView{
 
         editBar.apply {
@@ -21,11 +27,9 @@ class ListViewManager (private val context : Context,  private val mainLayout: M
             )
         }
 
-        //리싸이클러뷰의 item으로 사용할 data class 데이터타입의 Filter 인스턴스 리스트 받아오기
-        val itemList =  FilterFactory(context).getFilterItemList()
 
-        //어뎁터에 인스턴스 리스트 보내, 뷰 요소로 사용할 수 있도록 만들기
-        val filterAdapter = FilterAdapter(itemList)
+
+
 
         //어뎁터와 리싸이클러 뷰 갱신
         filterAdapter.notifyDataSetChanged()
@@ -46,6 +50,11 @@ class ListViewManager (private val context : Context,  private val mainLayout: M
             }
         }
         return  editBar
+    }
 
+    fun setCurrentItemImage (bitmap: Bitmap){
+        itemList.forEach { item -> item.updateThumbnail(bitmap)}
+
+        filterAdapter.notifyDataSetChanged()
     }
 }

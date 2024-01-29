@@ -28,9 +28,6 @@ class ImageViewManager (context : Context){
     }
 
 
-    fun getCurrentImage () : Bitmap {
-        return currentImage
-    }
     fun setCurrentImage (bitmap : Bitmap) {
         currentImage = bitmap
         imageView.setImageBitmap(currentImage)

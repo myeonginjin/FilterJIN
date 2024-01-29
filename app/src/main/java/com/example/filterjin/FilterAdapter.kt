@@ -1,6 +1,7 @@
 package com.example.filterjin
 
 import android.graphics.Bitmap
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -23,7 +24,7 @@ class FilterAdapter(val filterItemList: List<FilterItem>):
     override fun onBindViewHolder(holder: FilterViewHolder, position: Int) {
         holder.tv_time.text = filterItemList[position].id.toString()
         holder.tv_title.text = filterItemList[position].name
-        holder.tv_img.setImageResource(filterItemList[position].thumbnail)
+        holder.tv_img.setImageBitmap(filterItemList[position].thumbnail)
         holder.tv_name.text = filterItemList[position].imagePath
     }
 
@@ -52,6 +53,7 @@ class FilterAdapter(val filterItemList: List<FilterItem>):
         }
 
     }
+
 
 }
 

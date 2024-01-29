@@ -1,7 +1,10 @@
 package com.example.filterjin
 
 import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.media.Image
+import android.util.Log
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -16,6 +19,8 @@ class FilterFactory (private val context: Context) {
 
     fun getFilterItemList() : List<FilterItem>{
 
+        Log.d("FilterFactory", "getFilterItemList 시작")
+
         for (i in 0 until jsonArray.length()){
             val jsonObject = jsonArray.getJSONObject(i)
 
@@ -24,20 +29,19 @@ class FilterFactory (private val context: Context) {
             val rRatio = jsonObject.getDouble ("rRatio")
             val gRatio = jsonObject.getDouble ("gRatio")
             val bRatio = jsonObject.getDouble ("bRatio")
-
-            val thumbnail  = R.drawable.grayscale_test
+            val thumbnail  = BitmapFactory.decodeResource(context.resources, R.drawable.test)
             val imagePath = jsonObject.getString("imagePath")
 
-            val filter = FilterItem(id,name, thumbnail ,rRatio,gRatio , bRatio, imagePath)
+            try {
 
-            filterList.add(filter)
+                val filter = FilterItem(id, name, thumbnail, rRatio, gRatio, bRatio, imagePath)
+                filterList.add(filter)
+
+            }catch (e : Exception){
+                Log.e("getFilterItemList_error","${e.message}" )
+            }
         }
 
         return  filterList
     }
-
-
-
-
-
 }
