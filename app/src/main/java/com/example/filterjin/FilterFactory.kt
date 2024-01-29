@@ -29,7 +29,15 @@ class FilterFactory (private val context: Context) {
             val rRatio = jsonObject.getDouble ("rRatio")
             val gRatio = jsonObject.getDouble ("gRatio")
             val bRatio = jsonObject.getDouble ("bRatio")
-            val thumbnail  = BitmapFactory.decodeResource(context.resources, R.drawable.test)
+
+            val defaultImage  = BitmapFactory.decodeResource(context.resources, R.drawable.test)
+
+            val thumbnail = if (name == "GrayScale"){
+                ImageProcessor.applyGrayScaleFilter(defaultImage, rRatio, gRatio, bRatio)
+            } else{
+                defaultImage
+            }
+
             val imagePath = jsonObject.getString("imagePath")
 
             try {

@@ -40,9 +40,6 @@ class MainActivity : AppCompatActivity() {
         //동적으로 구현된 메인레이아웃 화면에 띄움
         setContentView(mainLayout.getMainLayout())
     }
-
-
-
-    }
+}
 
 

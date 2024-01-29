@@ -52,8 +52,15 @@ class ListViewManager (private val context : Context,  private val mainLayout: M
     }
 
     @SuppressLint("NotifyDataSetChanged")
-    fun setCurrentItemImage (bitmap: Bitmap){
-        itemList.forEach { item -> item.updateThumbnail(bitmap)}
+    fun setCurrentItemImage (bitmap: Bitmap) {
+        itemList.forEach { item ->
+            if (item.name == "GrayScale") {
+                item.updateThumbnail(ImageProcessor.applyGrayScaleFilter(bitmap, item.rRatio, item.gRatio , item.bRatio))
+            } else {
+                item.updateThumbnail(bitmap)
+            }
+        }
+
 
         //어뎁터와 리싸이클러 뷰 갱신
         filterAdapter.notifyDataSetChanged()
