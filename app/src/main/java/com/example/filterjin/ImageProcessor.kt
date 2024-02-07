@@ -62,6 +62,11 @@ object ImageProcessor {
         lutPixels = IntArray(lutSize * lutSize)
         lutBitmap.getPixels(lutPixels, 0, lutSize, 0, 0, lutSize, lutSize)
 
+         /*
+         val startTime = System.nanoTime()
+         Log.d("startTime", "메소드 시작 시간: ${startTime/ 1_000_000_000.0} ms")
+          */
+
         // 원본 이미지의 각 픽셀에 대해 LUT를 이용하여 새 색상을 적용
         for (index in srcPixels.indices) {
             val pixel = srcPixels[index]
@@ -75,11 +80,21 @@ object ImageProcessor {
             srcPixels[index] = lutPixel
         }
 
+         /*
+         val endTime = System.nanoTime()
+         Log.d("endTime", "메소드 종료 시간: ${endTime/ 1_000_000_000.0} ms")
+
+         val duration = (endTime - startTime) / 1_000_000_000.0
+         Log.d("Performance", "메소드 실행 시간: $duration ms          사진 크기 -  w : $width   h : $height ")
+          */
+
         // 필터가 적용된 비트맵을 생성하고 반환
         val filteredBitmap = Bitmap.createBitmap(width, height, src.config)
         filteredBitmap.setPixels(srcPixels, 0, width, 0, 0, width, height)
         return filteredBitmap
     }
+
+
 
     // LUT이미지 파일을 통해 필터링한 픽셀을 반환해주는 함수
     private fun getLutPixel(red: Int, green: Int, blue: Int) : Int{
