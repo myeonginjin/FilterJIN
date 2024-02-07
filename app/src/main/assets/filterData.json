@@ -10,10 +10,10 @@
   },
   {
     "id" : 2,
-    "name" : "Lovely",
-    "rRatio" : 0.2126,
-    "gRatio" : 0.7152,
-    "bRatio" : 0.0722,
+    "name" : "LUTtest",
+    "rRatio" : 0.0,
+    "gRatio" : 0.0,
+    "bRatio" : 0.0,
     "imagePath" : "assests/img2"
   },
   {
