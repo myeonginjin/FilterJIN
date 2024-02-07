@@ -9,7 +9,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.constraintlayout.widget.ConstraintLayout
 
-class ImageViewManager (context : Context){
+class ImageViewManager (private val context : Context){
 
     private var imageView : ImageView = ImageView(context)
     private var defaultImage : Bitmap = BitmapFactory.decodeResource(context.resources, R.drawable.test)
@@ -35,10 +35,29 @@ class ImageViewManager (context : Context){
 
     fun applyFilter(item: FilterItem) {
 
-        if(item.name=="GrayScale"){
+        when {
+            item.name=="GrayScale" -> {
 
-            val  grayscaleBitmap = ImageProcessor.applyGrayScaleFilter(currentImage, item.rRatio,item.bRatio, item.gRatio)
-            setCurrentImage(grayscaleBitmap)
+                val  grayscaleBitmap = ImageProcessor.applyGrayScaleFilter(currentImage, item.rRatio,item.bRatio, item.gRatio)
+                setCurrentImage(grayscaleBitmap)
+            }
+            item.rRatio == 0.0 && item.bRatio == 0.0 && item.gRatio == 0.0 -> {
+
+                lateinit var lutBitmap: Bitmap
+                val assetManager = context.resources.assets
+
+
+                if(true){
+                    val inputStreamLUT = assetManager.open("grayscale.jpeg")
+                    lutBitmap = BitmapFactory.decodeStream(inputStreamLUT)
+
+                }
+
+                val applyLutBitmap = ImageProcessor.applyLutToBitmap(currentImage , lutBitmap)
+
+                setCurrentImage(applyLutBitmap)
+
+            }
         }
 
     }

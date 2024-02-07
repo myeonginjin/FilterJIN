@@ -176,11 +176,6 @@ class MainLayout(
 
 
 
-
-
-
-
-
         return  mainFrame
     }
 
