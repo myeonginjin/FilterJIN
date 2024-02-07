@@ -184,34 +184,36 @@ object ImageProcessor {
 
     private  fun bilinearInterpolation (color1 : Int , color2 : Int,  ratio : Double ): Int {
 
-//        //가중 평균값
-//        var outPutColor : Double
-//
-//        // 두 광원 값의 차이 절댓값
-//        val dis = kotlin.math.abs(color1 - color2)
-//
-//        // 가중 평균값을 구할 필요 없는 경우 (광원의 값이 4의 배수인 경우)
-//        if (ratio == 0.0){
-//            outPutColor = (color1 + color2) / 2.0
-//            outPutColor = round(outPutColor)
-//
-//            return outPutColor.toInt()
-//        }
-//
-//        // RGB 올림값으로 조회한 LUT픽셀의 광원값이 RGB 내림값으로 조회한 LUT픽셀의 광원값 보다 큰 경우
-//        if(color1 < color2) {
-//            outPutColor =  (color1 + (dis * ratio))
-//        }
-//
-//        // RGB 내림값으로 조회한 LUT픽셀의 광원값이 RGB 올림값으로 조회한 LUT픽셀의 광원값 보다 큰 경우
-//        else{
-//            outPutColor =  (color1 - (dis * ratio))
-//        }
-//
-//        // 광원 가중 평균값 반올림
-//        outPutColor = round( outPutColor )
-//
-//        return outPutColor.toInt()
+        /*
+        //가중 평균값
+        var outPutColor : Double
+
+        // 두 광원 값의 차이 절댓값
+        val dis = kotlin.math.abs(color1 - color2)
+
+        // 가중 평균값을 구할 필요 없는 경우 (광원의 값이 4의 배수인 경우)
+        if (ratio == 0.0){
+            outPutColor = (color1 + color2) / 2.0
+            outPutColor = round(outPutColor)
+
+            return outPutColor.toInt()
+        }
+
+        // RGB 올림값으로 조회한 LUT픽셀의 광원값이 RGB 내림값으로 조회한 LUT픽셀의 광원값 보다 큰 경우
+        if(color1 < color2) {
+            outPutColor =  (color1 + (dis * ratio))
+        }
+
+        // RGB 내림값으로 조회한 LUT픽셀의 광원값이 RGB 올림값으로 조회한 LUT픽셀의 광원값 보다 큰 경우
+        else{
+            outPutColor =  (color1 - (dis * ratio))
+        }
+
+        // 광원 가중 평균값 반올림
+        outPutColor = round( outPutColor )
+
+        return outPutColor.toInt()
+        */
 
         val ratio1 : Double = 1.0 - ratio
         val outputColor : Double = color1 * ( ratio1 ) + color2 * ratio
