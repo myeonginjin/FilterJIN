@@ -27,6 +27,11 @@ class ImageViewManager (private val context : Context){
         return imageView
     }
 
+    fun getCurrentImage(): Bitmap {
+
+        return currentImage
+    }
+
 
     fun setCurrentImage (bitmap : Bitmap) {
         currentImage = bitmap
