@@ -30,12 +30,27 @@ class FilterFactory (private val context: Context) {
             val gRatio = jsonObject.getDouble ("gRatio")
             val bRatio = jsonObject.getDouble ("bRatio")
 
-            val defaultImage  = BitmapFactory.decodeResource(context.resources, R.drawable.test)
+            val defaultImage  = BitmapFactory.decodeResource(context.resources, R.drawable.default_image)
 
-            val thumbnail = if (name == "GrayScale"){
-                ImageProcessor.applyGrayScaleFilter(defaultImage, rRatio, gRatio, bRatio)
-            } else{
-                defaultImage
+            var thumbnail : Bitmap
+
+            if (name == "GrayScale"){
+                thumbnail = ImageProcessor.applyGrayScaleFilter(defaultImage, rRatio, gRatio, bRatio)
+            }
+            else if(rRatio == 0.0 && bRatio == 0.0 && gRatio == 0.0) {
+                lateinit var lutBitmap: Bitmap
+                val assetManager = context.resources.assets
+
+                if(true){
+                    val inputStreamLUT = assetManager.open("grayscale.jpeg")
+                    lutBitmap = BitmapFactory.decodeStream(inputStreamLUT)
+                }
+                val applyLutBitmap = ImageProcessor.applyLutToBitmap(defaultImage , lutBitmap)
+                thumbnail = applyLutBitmap
+            }
+
+            else{
+                thumbnail = defaultImage
             }
 
             val imagePath = jsonObject.getString("imagePath")

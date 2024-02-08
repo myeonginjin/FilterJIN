@@ -3,6 +3,7 @@ package com.example.filterjin
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.util.Log
 import android.view.ViewGroup
@@ -54,9 +55,27 @@ class ListViewManager (private val context : Context,  private val mainLayout: M
     @SuppressLint("NotifyDataSetChanged")
     fun setCurrentItemImage (bitmap: Bitmap) {
         itemList.forEach { item ->
+
+
             if (item.name == "GrayScale") {
                 item.updateThumbnail(ImageProcessor.applyGrayScaleFilter(bitmap, item.rRatio, item.gRatio , item.bRatio))
-            } else {
+            }
+
+            else if(item.rRatio == 0.0 && item.bRatio == 0.0 && item.gRatio == 0.0) {
+                lateinit var lutBitmap: Bitmap
+                val assetManager = context.resources.assets
+
+
+                if(true){
+                    val inputStreamLUT = assetManager.open("grayscale.jpeg")
+                    lutBitmap = BitmapFactory.decodeStream(inputStreamLUT)
+
+                }
+
+                item.updateThumbnail(ImageProcessor.applyLutToBitmap(bitmap , lutBitmap))
+            }
+
+            else {
                 item.updateThumbnail(bitmap)
             }
         }
