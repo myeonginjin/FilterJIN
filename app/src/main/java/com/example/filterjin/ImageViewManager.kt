@@ -3,25 +3,25 @@ package com.example.filterjin
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.graphics.Color
-import android.util.Log
-import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.constraintlayout.widget.ConstraintLayout
 
 class ImageViewManager (private val context : Context){
 
     private var imageView : ImageView = ImageView(context)
-    private var defaultImage : Bitmap = BitmapFactory.decodeResource(context.resources, R.drawable.test)
-    private var currentImage : Bitmap = defaultImage
+    private var defaultImage : Bitmap = BitmapFactory.decodeResource(context.resources, R.drawable.default_image)
+    private var resizedImage : Bitmap = defaultImage
+    private var originImage : Bitmap = defaultImage
+    
 
     fun getImageView(): ImageView {
         imageView.apply {
-            setImageBitmap(currentImage)
+            setImageBitmap(resizedImage)
             layoutParams = ConstraintLayout.LayoutParams(
-                1000,
-                1000
+                ConstraintLayout.LayoutParams.MATCH_PARENT,
+                ConstraintLayout.LayoutParams.WRAP_CONTENT
             )
+            imageView.scaleType = ImageView.ScaleType.FIT_CENTER
             id = ConstraintLayout.generateViewId()
         }
         return imageView
@@ -29,13 +29,17 @@ class ImageViewManager (private val context : Context){
 
     fun getCurrentImage(): Bitmap {
 
-        return currentImage
+        return resizedImage
     }
 
 
-    fun setCurrentImage (bitmap : Bitmap) {
-        currentImage = bitmap
-        imageView.setImageBitmap(currentImage)
+    fun setImageView (bitmap: Bitmap) {
+        resizedImage = bitmap
+        imageView.setImageBitmap(resizedImage)
+    }
+
+    fun setOriginImage (bitmap : Bitmap) {
+        originImage = bitmap
     }
 
     fun applyFilter(item: FilterItem) {
@@ -43,8 +47,8 @@ class ImageViewManager (private val context : Context){
         when {
             item.name=="GrayScale" -> {
 
-                val  grayscaleBitmap = ImageProcessor.applyGrayScaleFilter(currentImage, item.rRatio,item.bRatio, item.gRatio)
-                setCurrentImage(grayscaleBitmap)
+                val  grayscaleBitmap = ImageProcessor.applyGrayScaleFilter(resizedImage, item.rRatio,item.bRatio, item.gRatio)
+                setImageView(grayscaleBitmap)
             }
             item.rRatio == 0.0 && item.bRatio == 0.0 && item.gRatio == 0.0 -> {
 
@@ -58,9 +62,9 @@ class ImageViewManager (private val context : Context){
 
                 }
 
-                val applyLutBitmap = ImageProcessor.applyLutToBitmap(currentImage , lutBitmap)
+                val applyLutBitmap = ImageProcessor.applyLutToBitmap(resizedImage , lutBitmap)
 
-                setCurrentImage(applyLutBitmap)
+                setImageView(applyLutBitmap)
 
             }
         }

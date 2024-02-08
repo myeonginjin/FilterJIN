@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Color
+import android.net.Uri
 import android.util.Log
 import kotlin.math.ceil
 import kotlin.math.floor
@@ -92,6 +93,10 @@ object ImageProcessor {
         val filteredBitmap = Bitmap.createBitmap(width, height, src.config)
         filteredBitmap.setPixels(srcPixels, 0, width, 0, 0, width, height)
         return filteredBitmap
+    }
+
+    fun getResizedBitmap(uri : Uri){
+
     }
 
 

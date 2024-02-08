@@ -15,14 +15,11 @@ import android.provider.MediaStore
 import android.util.Log
 import android.view.ViewGroup
 import android.widget.Button
-import android.widget.ImageView
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.app.ActivityCompat
-import androidx.recyclerview.widget.RecyclerView
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.FileOutputStream
@@ -54,7 +51,13 @@ class MainLayout(
         val inputStream = uri?.let { context.contentResolver.openInputStream(it) }
         //이미지 경로로 비트맵 이미지 객체 생성
         val bitmap = BitmapFactory.decodeStream(inputStream)
-        imageViewManager.setCurrentImage(bitmap)
+        imageViewManager.setOriginImage(bitmap)
+
+
+//        val resizeBitmap = ImageProcessor.getResizedBitmap(uri)
+        imageViewManager.setImageView(bitmap)
+
+
         listViewManager.setCurrentItemImage(bitmap)
     }
 
@@ -145,10 +148,10 @@ class MainLayout(
         ConstraintSet().apply {
             clone(mainFrame)
 
-            connect(imageView.id, ConstraintSet.TOP, ConstraintSet.PARENT_ID, ConstraintSet.TOP, 8)
-            connect(imageView.id, ConstraintSet.BOTTOM, ConstraintSet.PARENT_ID, ConstraintSet.BOTTOM, 8)
+            connect(imageView.id, ConstraintSet.TOP, topTabBar.id, ConstraintSet.BOTTOM, 8)
+            connect(imageView.id, ConstraintSet.BOTTOM, editBar.id, ConstraintSet.TOP, 8)
             connect(imageView.id, ConstraintSet.START, ConstraintSet.PARENT_ID, ConstraintSet.START,8)
-            connect(imageView.id, ConstraintSet.END, ConstraintSet.PARENT_ID, ConstraintSet.END, 8)
+            connect(imageView.id, ConstraintSet.END, ConstraintSet.PARENT_ID, ConstraintSet.END,8)
 
 
             applyTo(mainFrame)
@@ -157,7 +160,7 @@ class MainLayout(
         ConstraintSet().apply {
             clone(mainFrame)
 
-            connect(editBar.id, ConstraintSet.TOP, imageView.id, ConstraintSet.BOTTOM, 100)
+            connect(editBar.id, ConstraintSet.BOTTOM, ConstraintSet.PARENT_ID, ConstraintSet.BOTTOM, 104)
             connect(editBar.id, ConstraintSet.START, ConstraintSet.PARENT_ID, ConstraintSet.START,8)
             connect(editBar.id, ConstraintSet.END, ConstraintSet.PARENT_ID, ConstraintSet.END, 8)
 
@@ -165,6 +168,22 @@ class MainLayout(
             applyTo(mainFrame)
         }
 
+//        ConstraintSet().apply {
+//            clone(mainFrame)
+//
+//            // 기존의 연결을 유지하면서, editBar의 위치를 화면 하단으로 고정
+//            connect(editBar.id, ConstraintSet.BOTTOM, ConstraintSet.PARENT_ID, ConstraintSet.BOTTOM, 8)
+//
+//            // imageView의 하단을 editBar의 상단이 아닌, 화면 하단 또는 editBar 위에 동적으로 위치하도록 조정
+//            connect(imageView.id, ConstraintSet.BOTTOM, editBar.id, ConstraintSet.TOP, 8)
+//
+//            // 나머지 연결 설정 유지
+//            connect(imageView.id, ConstraintSet.TOP, topTabBar.id, ConstraintSet.BOTTOM, 8)
+//            connect(imageView.id, ConstraintSet.START, ConstraintSet.PARENT_ID, ConstraintSet.START, 8)
+//            connect(imageView.id, ConstraintSet.END, ConstraintSet.PARENT_ID, ConstraintSet.END, 8)
+//
+//            applyTo(mainFrame)
+//        }
 
 
         galleryBtn.setOnClickListener {
