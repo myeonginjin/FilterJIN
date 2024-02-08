@@ -46,11 +46,12 @@ class MainLayout(
 
 
     //사용자 기기 갤러리 통해서 받아온 이미지 이미지뷰어에 띄우기
-    fun loadImage(uri: Uri?) {
+    fun loadImage(bitmap: Bitmap) {
 
-        val inputStream = uri?.let { context.contentResolver.openInputStream(it) }
+//        val inputStream = uri?.let { context.contentResolver.openInputStream(it) }
         //이미지 경로로 비트맵 이미지 객체 생성
-        val bitmap = BitmapFactory.decodeStream(inputStream)
+//        val bitmap = BitmapFactory.decodeStream(inputStream)
+
         imageViewManager.setOriginImage(bitmap)
 
 
