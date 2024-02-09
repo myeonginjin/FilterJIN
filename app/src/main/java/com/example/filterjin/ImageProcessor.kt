@@ -95,11 +95,6 @@ object ImageProcessor {
         return filteredBitmap
     }
 
-    fun getResizedBitmap(uri : Uri){
-
-    }
-
-
 
     // LUT이미지 파일을 통해 필터링한 픽셀을 반환해주는 함수
     private fun getLutPixel(red: Int, green: Int, blue: Int) : Int{

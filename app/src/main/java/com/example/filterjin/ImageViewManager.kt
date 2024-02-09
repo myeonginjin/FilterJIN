@@ -19,7 +19,7 @@ class ImageViewManager (private val context : Context){
             setImageBitmap(resizedImage)
             layoutParams = ConstraintLayout.LayoutParams(
                 ConstraintLayout.LayoutParams.MATCH_PARENT,
-                ConstraintLayout.LayoutParams.WRAP_CONTENT
+                ConstraintLayout.LayoutParams.MATCH_PARENT
             )
             imageView.scaleType = ImageView.ScaleType.FIT_CENTER
             id = ConstraintLayout.generateViewId()
@@ -29,7 +29,12 @@ class ImageViewManager (private val context : Context){
 
     fun getCurrentImage(): Bitmap {
 
-        return resizedImage
+        lateinit var lutBitmap: Bitmap
+        val assetManager = context.resources.assets
+        val inputStreamLUT = assetManager.open("grayscale.jpeg")
+        lutBitmap = BitmapFactory.decodeStream(inputStreamLUT)
+
+        return ImageProcessor.applyLutToBitmap(originImage, lutBitmap)
     }
 
 
