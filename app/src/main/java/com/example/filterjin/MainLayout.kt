@@ -15,6 +15,7 @@ import android.provider.MediaStore
 import android.util.Log
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -30,36 +31,38 @@ class MainLayout(
     private val galleryLauncher: ActivityResultLauncher<Intent>?
 ) {
 
-    private val mainFrame = ConstraintLayout(context)
-    private val topTabBar = ConstraintLayout(context)
-    private val galleryBtn = Button(context)
-    private val toggleFilterBtn = Button(context)
-    private val saveBtn = Button(context)
 
 
     private val imageViewManager = ImageViewManager(context)
 
     private val listViewManager = ListViewManager(context, this, imageViewManager)
 
+
+    private val mainFrame = ConstraintLayout(context)
+    private val topTabBar = ConstraintLayout(context)
+    private val galleryBtn = Button(context)
+    private val toggleFilterBtn = Button(context)
+    private val saveBtn = Button(context)
+    private val imageViewFrame = LinearLayout(context)
+
+    private val imageView = imageViewManager.getImageView()
+
     //ListViewManager클래스로 RecyclerView 동적구현
     private val editBar = listViewManager.getEditBar()
 
 
+
     //사용자 기기 갤러리 통해서 받아온 이미지 이미지뷰어에 띄우기
-    fun loadImage(bitmap: Bitmap) {
-
-//        val inputStream = uri?.let { context.contentResolver.openInputStream(it) }
-        //이미지 경로로 비트맵 이미지 객체 생성
-//        val bitmap = BitmapFactory.decodeStream(inputStream)
-
-        imageViewManager.setOriginImage(bitmap)
+    fun setImage(originBitmap: Bitmap, resizedBitmap : Bitmap) {
 
 
-//        val resizeBitmap = ImageProcessor.getResizedBitmap(uri)
-        imageViewManager.setImageView(bitmap)
+        imageViewManager.setOriginImage(originBitmap)
 
 
-        listViewManager.setCurrentItemImage(bitmap)
+        imageViewManager.setImageView(resizedBitmap)
+
+
+        listViewManager.setCurrentItemImage(resizedBitmap)
     }
 
     fun getMainLayout() : ConstraintLayout{
@@ -71,6 +74,8 @@ class MainLayout(
             )
             setBackgroundColor(Color.WHITE)
         }
+
+
         topTabBar.apply {
             layoutParams = ConstraintLayout.LayoutParams(
                 ConstraintLayout.LayoutParams.MATCH_PARENT,
@@ -79,6 +84,7 @@ class MainLayout(
             id = ConstraintLayout.generateViewId()
         }
         mainFrame.addView(topTabBar)
+
 
         galleryBtn.apply {
             text = "Gallery"
@@ -101,6 +107,7 @@ class MainLayout(
         }
         topTabBar.addView(toggleFilterBtn)
 
+
         saveBtn.apply {
             text = "Save"
             layoutParams = ConstraintLayout.LayoutParams(
@@ -111,13 +118,32 @@ class MainLayout(
         }
         topTabBar.addView(saveBtn)
 
-        val imageView = imageViewManager.getImageView()
-        mainFrame.addView(imageView)
+
+        imageViewFrame.apply {
+            layoutParams = ConstraintLayout.LayoutParams(
+                ConstraintLayout.LayoutParams.MATCH_PARENT,
+                ConstraintLayout.LayoutParams.MATCH_CONSTRAINT
+            )
+            id = ConstraintLayout.generateViewId()
+        }
+        mainFrame.addView(imageViewFrame)
+
+
+        imageView.apply {
+            id = ConstraintLayout.generateViewId()
+        }
+        imageViewFrame.addView(imageView)
+
 
         editBar.apply {
             id = ConstraintLayout.generateViewId()
         }
         mainFrame.addView(editBar)
+
+
+
+
+
 
         ConstraintSet().apply {
             clone(mainFrame)
@@ -146,17 +172,19 @@ class MainLayout(
 
         }
 
+
         ConstraintSet().apply {
             clone(mainFrame)
 
-            connect(imageView.id, ConstraintSet.TOP, topTabBar.id, ConstraintSet.BOTTOM, 8)
-            connect(imageView.id, ConstraintSet.BOTTOM, editBar.id, ConstraintSet.TOP, 8)
-            connect(imageView.id, ConstraintSet.START, ConstraintSet.PARENT_ID, ConstraintSet.START,8)
-            connect(imageView.id, ConstraintSet.END, ConstraintSet.PARENT_ID, ConstraintSet.END,8)
+            connect(imageViewFrame.id, ConstraintSet.TOP, topTabBar.id, ConstraintSet.BOTTOM, 8)
+            connect(imageViewFrame.id, ConstraintSet.BOTTOM, editBar.id, ConstraintSet.TOP, 24)
+            connect(imageViewFrame.id, ConstraintSet.START, ConstraintSet.PARENT_ID, ConstraintSet.START,8)
+            connect(imageViewFrame.id, ConstraintSet.END, ConstraintSet.PARENT_ID, ConstraintSet.END,8)
 
 
             applyTo(mainFrame)
         }
+
 
         ConstraintSet().apply {
             clone(mainFrame)
@@ -169,22 +197,9 @@ class MainLayout(
             applyTo(mainFrame)
         }
 
-//        ConstraintSet().apply {
-//            clone(mainFrame)
-//
-//            // 기존의 연결을 유지하면서, editBar의 위치를 화면 하단으로 고정
-//            connect(editBar.id, ConstraintSet.BOTTOM, ConstraintSet.PARENT_ID, ConstraintSet.BOTTOM, 8)
-//
-//            // imageView의 하단을 editBar의 상단이 아닌, 화면 하단 또는 editBar 위에 동적으로 위치하도록 조정
-//            connect(imageView.id, ConstraintSet.BOTTOM, editBar.id, ConstraintSet.TOP, 8)
-//
-//            // 나머지 연결 설정 유지
-//            connect(imageView.id, ConstraintSet.TOP, topTabBar.id, ConstraintSet.BOTTOM, 8)
-//            connect(imageView.id, ConstraintSet.START, ConstraintSet.PARENT_ID, ConstraintSet.START, 8)
-//            connect(imageView.id, ConstraintSet.END, ConstraintSet.PARENT_ID, ConstraintSet.END, 8)
-//
-//            applyTo(mainFrame)
-//        }
+
+
+
 
 
         galleryBtn.setOnClickListener {

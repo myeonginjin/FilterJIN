@@ -21,7 +21,6 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-
         //카메라 앱 엑티비티에서 돌아올 때 안드로이드 시스템의 의해 ActivityResultCallback의 onActivity()함수 자동 실행
         galleryLauncher =
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
