@@ -21,46 +21,16 @@
   },
   {
     "id" : 3,
-    "name" : "RedRose",
+    "name" : "Amatorka",
     "category" : "PREMIUM",
     "type" : "LUT",
     "rRatio" : 0.0,
     "gRatio" : 0.0,
     "bRatio" : 0.0,
-    "LUT" : "redRose.png"
+    "LUT" : "amatorka.png"
   },
   {
     "id" : 4,
-    "name" : "BW200",
-    "category" : "MONOTONE",
-    "type" : "LUT",
-    "rRatio" : 0.0,
-    "gRatio" : 0.0,
-    "bRatio" : 0.0,
-    "LUT" : "grayScale.jpeg"
-  },
-  {
-    "id" : 5,
-    "name" : "BW400",
-    "category" : "MONOTONE",
-    "type" : "Ratio",
-    "rRatio" : 0.2126,
-    "gRatio" : 0.7152,
-    "bRatio" : 0.0722,
-    "LUT" : ""
-  },
-  {
-    "id" : 6,
-    "name" : "BW800",
-    "category" : "MONOTONE",
-    "type" : "Ratio",
-    "rRatio" : 0.7152,
-    "gRatio" : 0.2126,
-    "bRatio" : 0.0722,
-    "LUT" : ""
-  },
-  {
-    "id" : 7,
     "name" : "Red Splash",
     "category" : "ART",
     "type" : "LUT",
@@ -70,7 +40,7 @@
     "LUT" : "redS.jpg"
   },
   {
-    "id" : 8,
+    "id" : 5,
     "name" : "Green Splash",
     "category" : "ART",
     "type" : "LUT",
@@ -80,7 +50,7 @@
     "LUT" : "greenS.jpg"
   },
   {
-    "id" : 9,
+    "id" : 6,
     "name" : "Blue Splash",
     "category" : "ART",
     "type" : "LUT",
@@ -88,6 +58,36 @@
     "gRatio" : 0.0,
     "bRatio" : 0.0,
     "LUT" : "blueS.jpg"
+  },
+  {
+    "id" : 7,
+    "name" : "BW200",
+    "category" : "MONOTONE",
+    "type" : "LUT",
+    "rRatio" : 0.0,
+    "gRatio" : 0.0,
+    "bRatio" : 0.0,
+    "LUT" : "grayScale.jpeg"
+  },
+  {
+    "id" : 8,
+    "name" : "BW400",
+    "category" : "MONOTONE",
+    "type" : "Ratio",
+    "rRatio" : 0.2126,
+    "gRatio" : 0.7152,
+    "bRatio" : 0.0722,
+    "LUT" : ""
+  },
+  {
+    "id" : 9,
+    "name" : "BW800",
+    "category" : "MONOTONE",
+    "type" : "Ratio",
+    "rRatio" : 0.7152,
+    "gRatio" : 0.2126,
+    "bRatio" : 0.0722,
+    "LUT" : ""
   },
   {
     "id" : 10,

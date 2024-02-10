@@ -60,7 +60,7 @@ class MainLayout(
         imageViewManager.setOriginImage(originBitmap)
 
 
-        imageViewManager.setImageView(resizedBitmap)
+        imageViewManager.loadGalleryImage(resizedBitmap)
 
 
         listViewManager.setCurrentItemImage(thumbnailBitmap)

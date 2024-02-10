@@ -3,6 +3,7 @@ package com.example.filterjin
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.util.Log
 import android.widget.ImageView
 import androidx.constraintlayout.widget.ConstraintLayout
 
@@ -46,10 +47,14 @@ class ImageViewManager (private val context : Context){
         return originImage
     }
 
+    fun loadGalleryImage(bitmap: Bitmap){
+        resizedImage = bitmap
+        imageView.setImageBitmap(bitmap)
+    }
+
 
     fun setImageView (bitmap: Bitmap) {
-        resizedImage = bitmap
-        imageView.setImageBitmap(resizedImage)
+        imageView.setImageBitmap(bitmap)
     }
 
     fun setOriginImage (bitmap : Bitmap) {
@@ -58,39 +63,48 @@ class ImageViewManager (private val context : Context){
 
     fun applyFilter(item: FilterItem) {
 
-        if (currentFilterName == item.name){
+        Log.i("test","$currentFilterName     ${item.name}")
+
+        if (currentFilterName.equals(item.name)){
             setImageView(resizedImage)
             currentFilterType = null
             currentFilterName = null
+            currentFilterR = 0.0
+            currentFilterG = 0.0
+            currentFilterB = 0.0
         }
 
-        when (item.type) {
-            "Ratio" -> {
+        else{
+            when (item.type) {
+                "Ratio" -> {
 
-                val  grayscaleBitmap = ImageProcessor.applyRatioFilter(resizedImage, item.rRatio,item.bRatio, item.gRatio)
-                setImageView(grayscaleBitmap)
+                    val  grayscaleBitmap = ImageProcessor.applyRatioFilter(resizedImage, item.rRatio,item.bRatio, item.gRatio)
+                    setImageView(grayscaleBitmap)
+                }
+                "LUT" -> {
+
+                    lateinit var lutBitmap: Bitmap
+                    val assetManager = context.resources.assets
+                    val fileName : String = item.lut
+
+
+                    val inputStreamLUT = assetManager.open(fileName)
+                    lutBitmap = BitmapFactory.decodeStream(inputStreamLUT)
+
+
+                    val applyLutBitmap = ImageProcessor.applyLutToBitmap(resizedImage , lutBitmap)
+
+                    setImageView(applyLutBitmap)
+                }
             }
-            "LUT" -> {
-
-                lateinit var lutBitmap: Bitmap
-                val assetManager = context.resources.assets
-                val fileName : String = item.lut
-
-
-                val inputStreamLUT = assetManager.open(fileName)
-                lutBitmap = BitmapFactory.decodeStream(inputStreamLUT)
-
-
-                val applyLutBitmap = ImageProcessor.applyLutToBitmap(resizedImage , lutBitmap)
-
-                setImageView(applyLutBitmap)
-            }
+            currentFilterName = item.name
+            currentFilterType = item.type
+            currentFilterR = item.rRatio
+            currentFilterG = item.gRatio
+            currentFilterB = item.bRatio
         }
-        currentFilterType = item.type
-        currentFilterName = item.name
-        currentFilterR = item.rRatio
-        currentFilterG = item.gRatio
-        currentFilterB = item.bRatio
+
+
     }
 
 
