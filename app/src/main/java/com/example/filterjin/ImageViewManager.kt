@@ -3,6 +3,7 @@ package com.example.filterjin
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.Color
 import android.widget.ImageView
 import androidx.constraintlayout.widget.ConstraintLayout
 
@@ -22,7 +23,6 @@ class ImageViewManager (private val context : Context){
                 ConstraintLayout.LayoutParams.MATCH_PARENT
             )
             imageView.scaleType = ImageView.ScaleType.FIT_CENTER
-            id = ConstraintLayout.generateViewId()
         }
         return imageView
     }
