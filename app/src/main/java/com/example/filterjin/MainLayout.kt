@@ -12,6 +12,7 @@ import android.net.Uri
 import android.os.Build
 import android.os.Environment
 import android.provider.MediaStore
+import android.service.controls.templates.ThumbnailTemplate
 import android.util.Log
 import android.view.ViewGroup
 import android.widget.Button
@@ -53,16 +54,16 @@ class MainLayout(
 
 
     //사용자 기기 갤러리 통해서 받아온 이미지 이미지뷰어에 띄우기
-    fun setImage(originBitmap: Bitmap, resizedBitmap : Bitmap) {
+    fun setImage(originBitmap: Bitmap, resizedBitmap : Bitmap, thumbnailBitmap: Bitmap) {
 
 
         imageViewManager.setOriginImage(originBitmap)
 
 
-        imageViewManager.setImageView(resizedBitmap)
+        imageViewManager.loadGalleryImage(resizedBitmap)
 
 
-        listViewManager.setCurrentItemImage(resizedBitmap)
+        listViewManager.setCurrentItemImage(thumbnailBitmap)
     }
 
     fun getMainLayout() : ConstraintLayout{

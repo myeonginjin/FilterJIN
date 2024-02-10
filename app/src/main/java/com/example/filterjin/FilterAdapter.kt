@@ -25,7 +25,7 @@ class FilterAdapter(val filterItemList: List<FilterItem>):
         holder.tv_time.text = filterItemList[position].id.toString()
         holder.tv_title.text = filterItemList[position].name
         holder.tv_img.setImageBitmap(filterItemList[position].thumbnail)
-        holder.tv_name.text = filterItemList[position].imagePath
+        holder.tv_name.text = filterItemList[position].category
     }
 
     override fun getItemCount(): Int {
