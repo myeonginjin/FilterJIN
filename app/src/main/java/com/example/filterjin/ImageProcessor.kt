@@ -1,17 +1,13 @@
 package com.example.filterjin
 
-import android.annotation.SuppressLint
-import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Color
-import android.net.Uri
-import android.util.Log
 import kotlin.math.ceil
 import kotlin.math.floor
 
 object ImageProcessor {
 
-    fun applyGrayScaleFilter(
+    fun applyRatioFilter(
         originalBitmap: Bitmap,
         rRatio: Double,
         gRatio: Double,
@@ -21,9 +17,6 @@ object ImageProcessor {
         val width: Int = originalBitmap.width
         val height: Int = originalBitmap.height
 
-        Log.d("Filter", "Applying grayscale filter")
-
-        Log.i("size333", "w: $width    h : $height")
         // Get the pixels of the bitmap
         val pixels: IntArray = IntArray(width * height)
         originalBitmap.getPixels(pixels, 0, width, 0, 0, width, height)
@@ -45,10 +38,8 @@ object ImageProcessor {
         }
 
         // Create a new bitmap with the modified pixels
-        val grayscaleBitmap =
-            Bitmap.createBitmap(pixels, width, height, Bitmap.Config.ARGB_8888)
 
-        return grayscaleBitmap
+        return Bitmap.createBitmap(pixels, width, height, Bitmap.Config.ARGB_8888)
     }
 
     private lateinit var lutPixels : IntArray

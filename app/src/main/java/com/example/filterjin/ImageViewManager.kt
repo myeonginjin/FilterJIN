@@ -3,7 +3,6 @@ package com.example.filterjin
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.graphics.Color
 import android.widget.ImageView
 import androidx.constraintlayout.widget.ConstraintLayout
 
@@ -13,7 +12,12 @@ class ImageViewManager (private val context : Context){
     private var defaultImage : Bitmap = BitmapFactory.decodeResource(context.resources, R.drawable.default_image)
     private var resizedImage : Bitmap = defaultImage
     private var originImage : Bitmap = defaultImage
-    
+
+    private var currentFilterType: String? = null
+    private var currentFilterName: String? = null
+    private var currentFilterR: Double = 0.0
+    private var currentFilterG: Double = 0.0
+    private var currentFilterB: Double = 0.0
 
     fun getImageView(): ImageView {
         imageView.apply {
@@ -28,13 +32,18 @@ class ImageViewManager (private val context : Context){
     }
 
     fun getCurrentImage(): Bitmap {
-
-        lateinit var lutBitmap: Bitmap
-        val assetManager = context.resources.assets
-        val inputStreamLUT = assetManager.open("grayscale.jpeg")
-        lutBitmap = BitmapFactory.decodeStream(inputStreamLUT)
-
-        return ImageProcessor.applyLutToBitmap(originImage, lutBitmap)
+            when (currentFilterType){
+                "Ratio" -> {
+                    return ImageProcessor.applyRatioFilter(originImage, currentFilterR, currentFilterG, currentFilterB)
+                }
+                "LUT" -> {
+                    val assetManager = context.resources.assets
+                    val inputStreamLUT = currentFilterName?.let { assetManager.open(it) }
+                    val lutBitmap = BitmapFactory.decodeStream(inputStreamLUT)
+                    return ImageProcessor.applyLutToBitmap(originImage, lutBitmap)
+                }
+            }
+        return originImage
     }
 
 
@@ -49,31 +58,39 @@ class ImageViewManager (private val context : Context){
 
     fun applyFilter(item: FilterItem) {
 
-        when {
-            item.name=="GrayScale" -> {
+        if (currentFilterName == item.name){
+            setImageView(resizedImage)
+            currentFilterType = null
+            currentFilterName = null
+        }
 
-                val  grayscaleBitmap = ImageProcessor.applyGrayScaleFilter(resizedImage, item.rRatio,item.bRatio, item.gRatio)
+        when (item.type) {
+            "Ratio" -> {
+
+                val  grayscaleBitmap = ImageProcessor.applyRatioFilter(resizedImage, item.rRatio,item.bRatio, item.gRatio)
                 setImageView(grayscaleBitmap)
             }
-            item.rRatio == 0.0 && item.bRatio == 0.0 && item.gRatio == 0.0 -> {
+            "LUT" -> {
 
                 lateinit var lutBitmap: Bitmap
                 val assetManager = context.resources.assets
+                val fileName : String = item.lut
 
 
-                if(true){
-                    val inputStreamLUT = assetManager.open("grayscale.jpeg")
-                    lutBitmap = BitmapFactory.decodeStream(inputStreamLUT)
+                val inputStreamLUT = assetManager.open(fileName)
+                lutBitmap = BitmapFactory.decodeStream(inputStreamLUT)
 
-                }
 
                 val applyLutBitmap = ImageProcessor.applyLutToBitmap(resizedImage , lutBitmap)
 
                 setImageView(applyLutBitmap)
-
             }
         }
-
+        currentFilterType = item.type
+        currentFilterName = item.name
+        currentFilterR = item.rRatio
+        currentFilterG = item.gRatio
+        currentFilterB = item.bRatio
     }
 
 

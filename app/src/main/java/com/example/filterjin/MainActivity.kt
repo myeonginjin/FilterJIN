@@ -56,9 +56,29 @@ class MainActivity : AppCompatActivity() {
                                 rotatedResizedBitmap = resizedBitmap?.let { rotateImageIfRequired(this, it, imageUri) }
                             }
 
+                            var rotatedResizedThumbnail: Bitmap? = null
+                            contentResolver.openInputStream(imageUri)?.use { inputStream ->
+                                // 적절한 inSampleSize 계산
+                                val options = BitmapFactory.Options().apply { inJustDecodeBounds = true }
+                                BitmapFactory.decodeStream(inputStream, null, options)
+                                val calRatio = calculateSampleSize(
+                                    options,
+                                    100,
+                                    100
+                                )
+                                // 실제 리사이징을 위해 inSampleSize 설정
+                                options.apply {
+                                    inJustDecodeBounds = false
+                                    inSampleSize = calRatio
+                                }
+                                // 리사이징된 이미지 생성
+                                val resizedBitmap = BitmapFactory.decodeStream(contentResolver.openInputStream(imageUri), null, options)
+                                rotatedResizedThumbnail = resizedBitmap?.let { rotateImageIfRequired(this, it, imageUri) }
+                            }
+
                             // MainLayout에 원본 및 리사이징된 이미지 설정
                             if (rotatedOriginalBitmap != null && rotatedResizedBitmap != null) {
-                                mainLayout.setImage(rotatedOriginalBitmap!!, rotatedResizedBitmap!!)
+                                mainLayout.setImage(rotatedOriginalBitmap!!, rotatedResizedBitmap!!, rotatedResizedThumbnail!!)
                             }
                         }
                     }

@@ -4,8 +4,6 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.graphics.Color
-import android.util.Log
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -57,20 +55,20 @@ class ListViewManager (private val context : Context,  private val mainLayout: M
         itemList.forEach { item ->
 
 
-            if (item.name == "GrayScale") {
-                item.updateThumbnail(ImageProcessor.applyGrayScaleFilter(bitmap, item.rRatio, item.gRatio , item.bRatio))
+            if (item.type == "Ratio") {
+                item.updateThumbnail(ImageProcessor.applyRatioFilter(bitmap, item.rRatio, item.gRatio , item.bRatio))
             }
 
-            else if(item.rRatio == 0.0 && item.bRatio == 0.0 && item.gRatio == 0.0) {
+            else if(item.type == "LUT") {
                 lateinit var lutBitmap: Bitmap
                 val assetManager = context.resources.assets
+                val fileName : String = item.lut
 
 
-                if(true){
-                    val inputStreamLUT = assetManager.open("grayscale.jpeg")
-                    lutBitmap = BitmapFactory.decodeStream(inputStreamLUT)
+                val inputStreamLUT = assetManager.open(fileName)
+                lutBitmap = BitmapFactory.decodeStream(inputStreamLUT)
 
-                }
+
 
                 item.updateThumbnail(ImageProcessor.applyLutToBitmap(bitmap , lutBitmap))
             }
