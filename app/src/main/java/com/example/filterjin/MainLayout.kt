@@ -16,6 +16,7 @@ import android.service.controls.templates.ThumbnailTemplate
 import android.util.Log
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.HorizontalScrollView
 import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
@@ -47,9 +48,12 @@ class MainLayout(
     private val imageViewFrame = LinearLayout(context)
 
     private val imageView = imageViewManager.getImageView()
-
+    private val categoryBar = setupCategoryBar()
     //ListViewManager클래스로 RecyclerView 동적구현
     private val editBar = listViewManager.getEditBar()
+
+
+
 
 
 
@@ -65,6 +69,44 @@ class MainLayout(
 
         listViewManager.setCurrentItemImage(thumbnailBitmap)
     }
+
+
+
+    private fun setupCategoryBar(): HorizontalScrollView {
+        val horizontalScrollView = HorizontalScrollView(context).apply {
+            layoutParams = ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            )
+        }
+        val categoryList = LinearLayout(context).apply {
+            orientation = LinearLayout.HORIZONTAL
+            layoutParams = ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT, // LinearLayout의 너비를 WRAP_CONTENT로 변경
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            )
+        }
+        val categories = listOf("ALL") + listViewManager.getUniqueCategories()
+        setupCategoryButtons(categories, categoryList)
+        horizontalScrollView.addView(categoryList) // LinearLayout을 HorizontalScrollView에 추가
+        return horizontalScrollView
+    }
+
+
+
+    private fun setupCategoryButtons(categories: List<String>, categoryList: LinearLayout) {
+        categories.forEach { category ->
+            val button = Button(context).apply {
+                text = category
+                setOnClickListener {
+                    // 선택된 카테고리의 첫 아이템으로 스크롤
+                    listViewManager.scrollToCategory(category)
+                }
+            }
+            categoryList.addView(button)
+        }
+    }
+
 
     fun getMainLayout() : ConstraintLayout{
 
@@ -136,6 +178,13 @@ class MainLayout(
         imageViewFrame.addView(imageView)
 
 
+        categoryBar.apply {
+            id = ConstraintLayout.generateViewId()
+        }
+        mainFrame.addView(categoryBar)
+
+
+
         editBar.apply {
             id = ConstraintLayout.generateViewId()
         }
@@ -178,7 +227,7 @@ class MainLayout(
             clone(mainFrame)
 
             connect(imageViewFrame.id, ConstraintSet.TOP, topTabBar.id, ConstraintSet.BOTTOM, 8)
-            connect(imageViewFrame.id, ConstraintSet.BOTTOM, editBar.id, ConstraintSet.TOP, 24)
+            connect(imageViewFrame.id, ConstraintSet.BOTTOM, categoryBar.id, ConstraintSet.TOP, 24)
             connect(imageViewFrame.id, ConstraintSet.START, ConstraintSet.PARENT_ID, ConstraintSet.START,8)
             connect(imageViewFrame.id, ConstraintSet.END, ConstraintSet.PARENT_ID, ConstraintSet.END,8)
 
@@ -186,6 +235,16 @@ class MainLayout(
             applyTo(mainFrame)
         }
 
+        ConstraintSet().apply {
+            clone(mainFrame)
+
+            connect(categoryBar.id, ConstraintSet.BOTTOM, editBar.id, ConstraintSet.TOP, 0)
+            connect(categoryBar.id, ConstraintSet.START, ConstraintSet.PARENT_ID, ConstraintSet.START,0)
+            connect(categoryBar.id, ConstraintSet.END, ConstraintSet.PARENT_ID, ConstraintSet.END,0)
+
+
+            applyTo(mainFrame)
+        }
 
         ConstraintSet().apply {
             clone(mainFrame)

@@ -9,7 +9,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 
-class FilterAdapter(val filterItemList: List<FilterItem>):
+class FilterAdapter(var filterItemList: List<FilterItem>):
     RecyclerView.Adapter<FilterAdapter.FilterViewHolder>() {
 
     interface OnItemClickListener {
@@ -31,6 +31,8 @@ class FilterAdapter(val filterItemList: List<FilterItem>):
     override fun getItemCount(): Int {
         return filterItemList.count()
     }
+
+
 
 
     inner class FilterViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {

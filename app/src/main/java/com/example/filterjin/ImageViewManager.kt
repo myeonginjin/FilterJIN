@@ -53,7 +53,7 @@ class ImageViewManager (private val context : Context){
     }
 
 
-    fun setImageView (bitmap: Bitmap) {
+    private fun setImageView (bitmap: Bitmap) {
         imageView.setImageBitmap(bitmap)
     }
 
