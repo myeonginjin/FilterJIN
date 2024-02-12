@@ -17,6 +17,10 @@ class FilterFactory (private val context: Context) {
     }
 
 
+    fun getFilterCategoryList() :  List<FilterItem>{
+        return filterList
+    }
+
 
     fun getFilterItemList() : List<FilterItem>{
 
