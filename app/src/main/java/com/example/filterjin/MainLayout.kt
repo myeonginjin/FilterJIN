@@ -54,6 +54,9 @@ class MainLayout(
 
 
 
+
+
+
     //사용자 기기 갤러리 통해서 받아온 이미지 이미지뷰어에 띄우기
     fun setImage(originBitmap: Bitmap, resizedBitmap : Bitmap, thumbnailBitmap: Bitmap) {
 
@@ -66,6 +69,8 @@ class MainLayout(
 
         listViewManager.setCurrentItemImage(thumbnailBitmap)
     }
+
+
 
     private fun setupCategoryBar(): HorizontalScrollView {
         val horizontalScrollView = HorizontalScrollView(context).apply {
@@ -87,21 +92,21 @@ class MainLayout(
         return horizontalScrollView
     }
 
+
+
     private fun setupCategoryButtons(categories: List<String>, categoryList: LinearLayout) {
         categories.forEach { category ->
             val button = Button(context).apply {
                 text = category
                 setOnClickListener {
-                    Toast.makeText(context,"rkdkd",Toast.LENGTH_SHORT)
+                    // 선택된 카테고리의 첫 아이템으로 스크롤
+                    listViewManager.scrollToCategory(category)
                 }
-            }
-            // "ALL" 카테고리의 경우, 앱 시작 시 자동으로 클릭되도록 설정
-            if (category == "ALL") {
-                button.performClick()
             }
             categoryList.addView(button)
         }
     }
+
 
     fun getMainLayout() : ConstraintLayout{
 

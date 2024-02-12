@@ -27,6 +27,18 @@ class ListViewManager (private val context : Context,  private val mainLayout: M
 
 
 
+    fun scrollToCategory(category: String) {
+        if (category == "ALL") {
+            // ALL 카테고리 선택 시, 리스트의 가장 처음으로 스크롤
+            (editBar.layoutManager as? LinearLayoutManager)?.scrollToPositionWithOffset(0, 0)
+        } else {
+            // 다른 카테고리 선택 시, 해당 카테고리의 첫 번째 아이템으로 스크롤
+            val position = itemList.indexOfFirst { it.category == category }
+            if (position != -1) {
+                (editBar.layoutManager as? LinearLayoutManager)?.scrollToPositionWithOffset(position, 0)
+            }
+        }
+    }
 
     @SuppressLint("NotifyDataSetChanged")
     fun getEditBar() : RecyclerView{
