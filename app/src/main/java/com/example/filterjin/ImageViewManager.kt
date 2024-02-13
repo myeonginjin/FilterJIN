@@ -15,7 +15,7 @@ class ImageViewManager (private val context : Context){
     private var originImage : Bitmap = defaultImage
 
     private var currentFilterType: String? = null
-    private var currentFilterName: String? = null
+    private var currentLUTName: String? = null
     private var currentFilterR: Double = 0.0
     private var currentFilterG: Double = 0.0
     private var currentFilterB: Double = 0.0
@@ -33,13 +33,16 @@ class ImageViewManager (private val context : Context){
     }
 
     fun getCurrentImage(): Bitmap {
+
+            Log.i("test2","$currentLUTName")
+
             when (currentFilterType){
                 "Ratio" -> {
                     return ImageProcessor.applyRatioFilter(originImage, currentFilterR, currentFilterG, currentFilterB)
                 }
                 "LUT" -> {
                     val assetManager = context.resources.assets
-                    val inputStreamLUT = currentFilterName?.let { assetManager.open(it) }
+                    val inputStreamLUT = currentLUTName?.let { assetManager.open(it) }
                     val lutBitmap = BitmapFactory.decodeStream(inputStreamLUT)
                     return ImageProcessor.applyLutToBitmap(originImage, lutBitmap)
                 }
@@ -63,12 +66,12 @@ class ImageViewManager (private val context : Context){
 
     fun applyFilter(item: FilterItem) {
 
-        Log.i("test","$currentFilterName     ${item.name}")
+        Log.i("test","$currentLUTName     ${item.name}")
 
-        if (currentFilterName.equals(item.name)){
+        if (currentLUTName.equals(item.name)){
             setImageView(resizedImage)
             currentFilterType = null
-            currentFilterName = null
+            currentLUTName = null
             currentFilterR = 0.0
             currentFilterG = 0.0
             currentFilterB = 0.0
@@ -97,7 +100,7 @@ class ImageViewManager (private val context : Context){
                     setImageView(applyLutBitmap)
                 }
             }
-            currentFilterName = item.name
+            currentLUTName = item.lut
             currentFilterType = item.type
             currentFilterR = item.rRatio
             currentFilterG = item.gRatio
