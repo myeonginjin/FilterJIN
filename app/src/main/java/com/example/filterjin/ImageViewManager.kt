@@ -11,10 +11,11 @@ class ImageViewManager (private val context : Context){
 
     private var imageView : ImageView = ImageView(context)
     private var defaultImage : Bitmap = BitmapFactory.decodeResource(context.resources, R.drawable.default_image)
-    private var resizedImage : Bitmap = defaultImage
     private var originImage : Bitmap = defaultImage
-
+    private var resizedImage : Bitmap = defaultImage
+    private var currentViewImage : Bitmap = defaultImage
     private var currentFilterType: String? = null
+    private var currentFilterName: String? = null
     private var currentLUTName: String? = null
     private var currentFilterR: Double = 0.0
     private var currentFilterG: Double = 0.0
@@ -34,8 +35,6 @@ class ImageViewManager (private val context : Context){
 
     fun getCurrentImage(): Bitmap {
 
-            Log.i("test2","$currentLUTName")
-
             when (currentFilterType){
                 "Ratio" -> {
                     return ImageProcessor.applyRatioFilter(originImage, currentFilterR, currentFilterG, currentFilterB)
@@ -52,11 +51,13 @@ class ImageViewManager (private val context : Context){
 
     fun loadGalleryImage(bitmap: Bitmap){
         resizedImage = bitmap
+        currentViewImage = bitmap
         imageView.setImageBitmap(bitmap)
     }
 
 
     private fun setImageView (bitmap: Bitmap) {
+        currentViewImage = bitmap
         imageView.setImageBitmap(bitmap)
     }
 
@@ -64,13 +65,24 @@ class ImageViewManager (private val context : Context){
         originImage = bitmap
     }
 
+    fun toggleImage (tap : Boolean){
+        if(tap){
+            imageView.setImageBitmap(resizedImage)
+        }
+        else{
+            imageView.setImageBitmap(currentViewImage)
+        }
+
+    }
+
     fun applyFilter(item: FilterItem) {
 
-        Log.i("test","$currentLUTName     ${item.name}")
+        Log.i("test","$currentFilterName     ${item.name}")
 
-        if (currentLUTName.equals(item.name)){
+        if (currentFilterName.equals(item.name)){
             setImageView(resizedImage)
             currentFilterType = null
+            currentFilterName = null
             currentLUTName = null
             currentFilterR = 0.0
             currentFilterG = 0.0
@@ -102,6 +114,7 @@ class ImageViewManager (private val context : Context){
             }
             currentLUTName = item.lut
             currentFilterType = item.type
+            currentFilterName = item.name
             currentFilterR = item.rRatio
             currentFilterG = item.gRatio
             currentFilterB = item.bRatio
