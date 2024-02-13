@@ -12,7 +12,7 @@ class ImageViewManager (private val context : Context){
     private var imageView : ImageView = ImageView(context)
     private var defaultImage : Bitmap = BitmapFactory.decodeResource(context.resources, R.drawable.default_image)
     var originImage : Bitmap = defaultImage
-    private var resizedImage : Bitmap = defaultImage
+    var resizedImage : Bitmap = defaultImage
     private var currentViewImage : Bitmap = defaultImage
     var currentFilterType: String? = null
     var currentFilterName: String? = null
@@ -33,21 +33,21 @@ class ImageViewManager (private val context : Context){
         return imageView
     }
 
-    fun getCurrentImage(): Bitmap {
-
-            when (currentFilterType){
-                "Ratio" -> {
-                    return ImageProcessor.applyRatioFilter(originImage, currentFilterR, currentFilterG, currentFilterB)
-                }
-                "LUT" -> {
-                    val assetManager = context.resources.assets
-                    val inputStreamLUT = currentLUTName?.let { assetManager.open(it) }
-                    val lutBitmap = BitmapFactory.decodeStream(inputStreamLUT)
-                    return ImageProcessor.applyLutToBitmap(originImage, lutBitmap)
-                }
-            }
-        return originImage
-    }
+//    fun getCurrentImage(): Bitmap {
+//
+//            when (currentFilterType){
+//                "Ratio" -> {
+//                    return ImageProcessor.applyRatioFilter(originImage, currentFilterR, currentFilterG, currentFilterB)
+//                }
+//                "LUT" -> {
+//                    val assetManager = context.resources.assets
+//                    val inputStreamLUT = currentLUTName?.let { assetManager.open(it) }
+//                    val lutBitmap = BitmapFactory.decodeStream(inputStreamLUT)
+//                    return ImageProcessor.applyLutToBitmap(originImage, lutBitmap)
+//                }
+//            }
+//        return originImage
+//    }
 
     fun loadGalleryImage(bitmap: Bitmap){
         resizedImage = bitmap
