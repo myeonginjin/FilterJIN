@@ -1,5 +1,6 @@
 package com.example.filterjin
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.ContentValues
 import android.content.Context
@@ -11,18 +12,24 @@ import android.graphics.Color
 import android.net.Uri
 import android.os.Build
 import android.os.Environment
+import android.os.Handler
+import android.os.Looper
 import android.provider.MediaStore
 import android.service.controls.templates.ThumbnailTemplate
 import android.util.Log
+import android.view.MotionEvent
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.HorizontalScrollView
 import android.widget.LinearLayout
+import android.widget.ProgressBar
 import android.widget.Toast
+import android.widget.ToggleButton
 import androidx.activity.result.ActivityResultLauncher
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.app.ActivityCompat
+import androidx.core.view.isVisible
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.FileOutputStream
@@ -53,6 +60,10 @@ class MainLayout(
     private val editBar = listViewManager.getEditBar()
 
 
+//    private val progressBar = ProgressBar(context, null, android.R.attr.progressBarStyleLarge).apply {
+//        isVisible = false // 초기에는 ProgressBar 숨기기
+//    }
+
 
 
 
@@ -69,6 +80,9 @@ class MainLayout(
 
         listViewManager.setCurrentItemImage(thumbnailBitmap)
     }
+
+
+
 
 
 
@@ -108,7 +122,25 @@ class MainLayout(
     }
 
 
+    @SuppressLint("ClickableViewAccessibility")
     fun getMainLayout() : ConstraintLayout{
+
+
+//        progressBar.apply {
+//            val layoutParams = ConstraintLayout.LayoutParams(
+//                ConstraintLayout.LayoutParams.WRAP_CONTENT,
+//                ConstraintLayout.LayoutParams.WRAP_CONTENT
+//            )
+//            layoutParams.apply {
+//                topToTop = ConstraintSet.PARENT_ID
+//                bottomToBottom = ConstraintSet.PARENT_ID
+//                startToStart = ConstraintSet.PARENT_ID
+//                endToEnd = ConstraintSet.PARENT_ID
+//            }
+//            this.layoutParams = layoutParams
+//            id = ConstraintLayout.generateViewId()
+//        }
+//        mainFrame.addView(progressBar)
 
         mainFrame.apply {
             layoutParams = ViewGroup.LayoutParams(
@@ -302,10 +334,64 @@ class MainLayout(
             }
         }
 
+//        @SuppressLint("ClickableViewAccessibility")
+//        fun setupSaveButtonWithBackgroundProcessing() {
+//            saveBtn.setOnClickListener {
+//                // 프로그레스바를 보이게 하고, 최대 값 설정
+//                progressBar.isVisible = true
+//                progressBar.max = 100
+//                progressBar.progress = 0
+//
+//                Thread {
+//                    // 여기서 이미지 처리 로직을 실행합니다. 예시로 진행 상태를 업데이트하는 코드를 넣었습니다.
+//                    for (i in 1..100) {
+//                        Thread.sleep(50) // 이미지 처리를 시뮬레이션하기 위한 딜레이
+//
+//                        // UI 스레드에서 ProgressBar 업데이트
+//                        Handler(Looper.getMainLooper()).post {
+//                            progressBar.progress = i
+//                        }
+//                    }
+//
+//                    // 이미지 처리가 끝나면 ProgressBar를 숨깁니다.
+//                    Handler(Looper.getMainLooper()).post {
+//                        progressBar.isVisible = false
+//                        Toast.makeText(context, "이미지 처리가 완료되었습니다.", Toast.LENGTH_SHORT).show()
+//                    }
+//                }.start()
+//            }
+//        }
+
+
+        toggleFilterBtn.setOnTouchListener { _, event ->
+            when (event.action) {
+                MotionEvent.ACTION_DOWN -> {
+                    // 사용자가 버튼을 꾹 누르고 있을 때의 동작
+                    // 원본 이미지 표시
+                    Log.i("test44","?@")
+                    Toast.makeText(context,"tapped",Toast.LENGTH_SHORT).show()
+                    imageViewManager.toggleImage(true)
+
+                    true // 이벤트 처리 완료
+                }
+                MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                    // 사용자가 버튼에서 손을 떼거나 취소했을 때의 동작
+                    // 필터 적용된 이미지 표시
+                    Toast.makeText(context,"no tapped",Toast.LENGTH_SHORT).show()
+                    imageViewManager.toggleImage(false)
+
+                    true // 이벤트 처리 완료
+                }
+                else -> false // 이외의 이벤트는 처리하지 않음
+            }
+        }
+
+
 
         return  mainFrame
     }
 
+    @SuppressLint("Recycle")
     private fun saveImageOnAboveAndroidQ(bitmap: Bitmap) {
         val fileName = System.currentTimeMillis().toString() + ".png" // 파일이름 현재시간.png
 
