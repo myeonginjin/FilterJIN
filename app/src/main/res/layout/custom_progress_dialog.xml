@@ -38,15 +38,15 @@
         </LinearLayout>
     </LinearLayout>
 
-    <!-- X 버튼 추가 -->
-    <ImageButton
-        android:id="@+id/closeButton"
-        android:src="@drawable/outline_cancel_24"
-        android:layout_width="11dp"
-        android:layout_height="11dp"
-        android:layout_gravity="end|top"
-        android:layout_margin="10dp"
-        android:background="?android:selectableItemBackgroundBorderless"
-        android:contentDescription="@string/close_button_description"/>
+<!--    &lt;!&ndash; X 버튼 추가 &ndash;&gt;-->
+<!--    <ImageButton-->
+<!--        android:id="@+id/closeButton"-->
+<!--        android:src="@drawable/outline_cancel_24"-->
+<!--        android:layout_width="11dp"-->
+<!--        android:layout_height="11dp"-->
+<!--        android:layout_gravity="end|top"-->
+<!--        android:layout_margin="10dp"-->
+<!--        android:background="?android:selectableItemBackgroundBorderless"-->
+<!--        android:contentDescription="@string/close_button_description"/>-->
 
 </FrameLayout>

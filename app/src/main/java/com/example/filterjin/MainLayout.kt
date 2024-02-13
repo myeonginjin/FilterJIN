@@ -78,11 +78,13 @@ class MainLayout(
     private var imageProcessingJob: Job? = null // 이미지 처리 작업을 관리할 Job 변수
 
 
+
+
     //사용자 기기 갤러리 통해서 받아온 이미지 이미지뷰어에 띄우기
     fun setImage(originBitmap: Bitmap, resizedBitmap : Bitmap, thumbnailBitmap: Bitmap) {
 
 
-        imageViewManager.setOriginImage(originBitmap)
+        imageViewManager.originImage = originBitmap
 
 
         imageViewManager.loadGalleryImage(resizedBitmap)
@@ -101,12 +103,12 @@ class MainLayout(
             setContentView(R.layout.custom_progress_dialog) // 커스텀 레이아웃 설정
             setCancelable(false) // 뒤로 가기 버튼으로 취소 불가능하도록 설정
 
-            // 취소 버튼 리스너 설정
-            val closeButton = findViewById<ImageView>(R.id.closeButton)
-            closeButton.setOnClickListener {
-                dismiss() // 다이얼로그 먼저 닫기
-                imageProcessingJob?.cancel() // 이미지 처리 작업 취소
-            }
+//            // 취소 버튼 리스너 설정
+//            val closeButton = findViewById<ImageView>(R.id.closeButton)
+//            closeButton.setOnClickListener {
+//                progressDialog.dismiss()  // 다이얼로그 먼저 닫기
+//                imageProcessingJob?.cancel() // 이미지 처리 작업 취소
+//            }
         }
     }
 
@@ -312,45 +314,63 @@ class MainLayout(
 
 
         saveBtn.setOnClickListener {
-            // 이미지 처리 작업을 시작하기 전에 현재 시간을 기록합니다.
-            val startTime = System.currentTimeMillis()
-
+            progressDialog.show() // 프로그레스 다이얼로그 표시
             imageProcessingJob = coroutineScope.launch {
+                var processedBitmap: Bitmap? = null
                 try {
-                    progressDialog.show() // 프로그레스 다이얼로그 표시
-                    val processedBitmap = withContext(Dispatchers.Default) {
+                    // 이미지 처리 로직 시작
+                    processedBitmap = withContext(Dispatchers.Default) {
                         // 이미지 처리 로직
-                        val image = imageViewManager.getCurrentImage()
-                        // 취소 가능한 지점 예시
-                        if (!isActive) return@withContext null // 취소 상태 확인
-                        // 이미지 처리 계속...
-                        image
-                    } ?: return@launch // 취소된 경우 여기서 종료
-
-                    // 이미지 저장 로직을 수행합니다. (Dispatchers.IO 사용 권장)
-                    withContext(Dispatchers.IO) {
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                            saveImageOnAboveAndroidQ(processedBitmap)
-                        } else {
-                            saveImageOnUnderAndroidQ(processedBitmap)
+                        val currentFilterType = imageViewManager.currentFilterType
+                        val originImage = imageViewManager.originImage
+                        when (currentFilterType) {
+                            "Ratio" -> {
+                                ImageProcessor.applyRatioFilter(
+                                    originalBitmap = originImage,
+                                    rRatio = imageViewManager.currentFilterR,
+                                    gRatio = imageViewManager.currentFilterG,
+                                    bRatio = imageViewManager.currentFilterB
+                                ).also {
+                                    // 취소 상태 확인
+                                    if (!isActive) return@withContext null
+                                }
+                            }
+                            "LUT" -> {
+                                val lutBitmap = BitmapFactory.decodeStream(context.assets.open(imageViewManager.currentLUTName!!))
+                                ImageProcessor.applyLutToBitmap(originImage, lutBitmap).also {
+                                    // 취소 상태 확인
+                                    if (!isActive) return@withContext null
+                                }
+                            }
+                            else -> originImage
                         }
                     }
 
-                    // 현재 시간과 작업 시작 시간의 차이를 계산합니다.
-                    val elapsedTime = System.currentTimeMillis() - startTime
-                    // 지정된 최소 시간(예: 1000ms) 동안 대기했는지 확인합니다.
-                    if (elapsedTime < 1000) {
-                        // 남은 시간만큼 대기합니다.
-                        delay(1000 - elapsedTime)
+                    // 이미지 저장 로직
+                    processedBitmap?.let {
+                        withContext(Dispatchers.IO) {
+                            // 취소 상태 확인
+                            if (!isActive) return@withContext
+
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                                saveImageOnAboveAndroidQ(it)
+                            } else {
+                                saveImageOnUnderAndroidQ(it)
+                            }
+                        }
                     }
                 } catch (e: Exception) {
-                    // 취소된 경우나 에러 발생 시 처리
+                    // 에러 처리
                 } finally {
-                    progressDialog.dismiss()
-                    if (!isActive) {
-                        Toast.makeText(context, "이미지 처리가 취소되었습니다.", Toast.LENGTH_SHORT).show()
-                    } else {
-                        Toast.makeText(context, "이미지 저장 완료", Toast.LENGTH_SHORT).show()
+                    withContext(Dispatchers.Main) {
+                        progressDialog.dismiss()
+                        if (!isActive) {
+                            Toast.makeText(context, "이미지 처리가 취소되었습니다.", Toast.LENGTH_SHORT).show()
+                        } else {
+                            processedBitmap?.let {
+                                Toast.makeText(context, "이미지 저장 완료", Toast.LENGTH_SHORT).show()
+                            } ?: Toast.makeText(context, "이미지 처리 실패", Toast.LENGTH_SHORT).show()
+                        }
                     }
                 }
             }

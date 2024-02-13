@@ -11,15 +11,15 @@ class ImageViewManager (private val context : Context){
 
     private var imageView : ImageView = ImageView(context)
     private var defaultImage : Bitmap = BitmapFactory.decodeResource(context.resources, R.drawable.default_image)
-    private var originImage : Bitmap = defaultImage
+    var originImage : Bitmap = defaultImage
     private var resizedImage : Bitmap = defaultImage
     private var currentViewImage : Bitmap = defaultImage
-    private var currentFilterType: String? = null
-    private var currentFilterName: String? = null
-    private var currentLUTName: String? = null
-    private var currentFilterR: Double = 0.0
-    private var currentFilterG: Double = 0.0
-    private var currentFilterB: Double = 0.0
+    var currentFilterType: String? = null
+    var currentFilterName: String? = null
+    var currentLUTName: String? = null
+    var currentFilterR: Double = 0.0
+    var currentFilterG: Double = 0.0
+    var currentFilterB: Double = 0.0
 
     fun getImageView(): ImageView {
         imageView.apply {
@@ -61,9 +61,9 @@ class ImageViewManager (private val context : Context){
         imageView.setImageBitmap(bitmap)
     }
 
-    fun setOriginImage (bitmap : Bitmap) {
-        originImage = bitmap
-    }
+//    fun setOriginImage (bitmap : Bitmap) {
+//        originImage = bitmap
+//    }
 
     fun toggleImage (tap : Boolean){
         if(tap){
