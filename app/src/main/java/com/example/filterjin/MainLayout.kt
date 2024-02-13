@@ -35,7 +35,9 @@ import androidx.core.app.ActivityCompat
 import androidx.core.view.isVisible
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
@@ -70,7 +72,7 @@ class MainLayout(
 
     private val coroutineScope = CoroutineScope(Dispatchers.Main)
     private lateinit var progressDialog: AlertDialog
-
+    private var imageProcessingJob: Job? = null // 이미지 처리 작업을 관리할 Job 변수
 
 
     //사용자 기기 갤러리 통해서 받아온 이미지 이미지뷰어에 띄우기
@@ -101,7 +103,10 @@ class MainLayout(
             setView(progressBar)
             setMessage("이미지 저장 중...")
             setCancelable(false)
-
+            setNegativeButton("취소") { dialog, _ ->
+                imageProcessingJob?.cancel() // 이미지 처리 작업 취소
+                dialog.dismiss()
+            }
         }
         progressDialog = builder.create()
     }
@@ -309,24 +314,38 @@ class MainLayout(
 
 
         saveBtn.setOnClickListener {
-            coroutineScope.launch {
-                progressDialog.show() // 프로그레스바 표시 시작
+            // 이미지 처리 작업을 시작하기 전에 이전에 진행 중이던 작업이 있다면 취소합니다.
+            imageProcessingJob?.cancel()
+
+            // 새로운 코루틴 작업을 시작합니다.
+            imageProcessingJob = coroutineScope.launch {
+                progressDialog.show() // 프로그레스 다이얼로그를 표시합니다.
+                val startTime = System.currentTimeMillis() // 현재 시간을 기록합니다.
+
+                // 비동기적으로 이미지 처리 작업을 수행합니다.
                 val processedBitmap = withContext(Dispatchers.Default) {
-                    // 이미지 처리 작업
                     imageViewManager.getCurrentImage()
                 }
+
+                // 이미지 저장 작업을 IO 스레드에서 수행합니다.
                 withContext(Dispatchers.IO) {
-                    // 이미지 저장 작업
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                         saveImageOnAboveAndroidQ(processedBitmap)
                     } else {
                         saveImageOnUnderAndroidQ(processedBitmap)
                     }
                 }
-                withContext(Dispatchers.Main) {
-                    progressDialog.dismiss() // 프로그레스바 숨김
-                    Toast.makeText(context, "이미지 저장이 완료되었습니다.", Toast.LENGTH_SHORT).show()
+
+                // 작업의 총 소요 시간을 계산합니다.
+                val elapsedTime = System.currentTimeMillis() - startTime
+                // 작업 시간이 1초 미만이면, 최소 1초간 사용자에게 프로그레스바를 보여주기 위해 지연합니다.
+                if (elapsedTime < 1000) {
+                    delay(1000 - elapsedTime)
                 }
+
+                // 메인 스레드에서 UI 업데이트를 수행합니다.
+                progressDialog.dismiss() // 프로그레스 다이얼로그를 숨깁니다.
+                Toast.makeText(context, "이미지 저장이 완료되었습니다.", Toast.LENGTH_SHORT).show()
             }
         }
 
