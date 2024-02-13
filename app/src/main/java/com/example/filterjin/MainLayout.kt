@@ -2,8 +2,11 @@ package com.example.filterjin
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.app.AlertDialog
+import android.app.ProgressDialog
 import android.content.ContentValues
 import android.content.Context
+import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
@@ -30,6 +33,11 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.app.ActivityCompat
 import androidx.core.view.isVisible
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.FileOutputStream
@@ -60,11 +68,8 @@ class MainLayout(
     private val editBar = listViewManager.getEditBar()
 
 
-//    private val progressBar = ProgressBar(context, null, android.R.attr.progressBarStyleLarge).apply {
-//        isVisible = false // 초기에는 ProgressBar 숨기기
-//    }
-
-
+    private val coroutineScope = CoroutineScope(Dispatchers.Main)
+    private lateinit var progressDialog: AlertDialog
 
 
 
@@ -83,7 +88,23 @@ class MainLayout(
 
 
 
+    init {
+        createProgressDialog()
+    }
+    private fun createProgressDialog() {
+        val progressBar = ProgressBar(context).apply {
+            isIndeterminate = true
+            setPadding(30, 30, 30, 30)
+        }
 
+        val builder = AlertDialog.Builder(context).apply {
+            setView(progressBar)
+            setMessage("이미지 저장 중...")
+            setCancelable(false)
+
+        }
+        progressDialog = builder.create()
+    }
 
 
     private fun setupCategoryBar(): HorizontalScrollView {
@@ -126,21 +147,6 @@ class MainLayout(
     fun getMainLayout() : ConstraintLayout{
 
 
-//        progressBar.apply {
-//            val layoutParams = ConstraintLayout.LayoutParams(
-//                ConstraintLayout.LayoutParams.WRAP_CONTENT,
-//                ConstraintLayout.LayoutParams.WRAP_CONTENT
-//            )
-//            layoutParams.apply {
-//                topToTop = ConstraintSet.PARENT_ID
-//                bottomToBottom = ConstraintSet.PARENT_ID
-//                startToStart = ConstraintSet.PARENT_ID
-//                endToEnd = ConstraintSet.PARENT_ID
-//            }
-//            this.layoutParams = layoutParams
-//            id = ConstraintLayout.generateViewId()
-//        }
-//        mainFrame.addView(progressBar)
 
         mainFrame.apply {
             layoutParams = ViewGroup.LayoutParams(
@@ -302,7 +308,30 @@ class MainLayout(
 
 
 
+        saveBtn.setOnClickListener {
+            coroutineScope.launch {
+                progressDialog.show() // 프로그레스바 표시 시작
+                val processedBitmap = withContext(Dispatchers.Default) {
+                    // 이미지 처리 작업
+                    imageViewManager.getCurrentImage()
+                }
+                withContext(Dispatchers.IO) {
+                    // 이미지 저장 작업
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                        saveImageOnAboveAndroidQ(processedBitmap)
+                    } else {
+                        saveImageOnUnderAndroidQ(processedBitmap)
+                    }
+                }
+                withContext(Dispatchers.Main) {
+                    progressDialog.dismiss() // 프로그레스바 숨김
+                    Toast.makeText(context, "이미지 저장이 완료되었습니다.", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
 
+
+        /*
         saveBtn.setOnClickListener {
 
             Toast.makeText(context, "saveBtn tapped", Toast.LENGTH_SHORT).show()
@@ -334,33 +363,7 @@ class MainLayout(
             }
         }
 
-//        @SuppressLint("ClickableViewAccessibility")
-//        fun setupSaveButtonWithBackgroundProcessing() {
-//            saveBtn.setOnClickListener {
-//                // 프로그레스바를 보이게 하고, 최대 값 설정
-//                progressBar.isVisible = true
-//                progressBar.max = 100
-//                progressBar.progress = 0
-//
-//                Thread {
-//                    // 여기서 이미지 처리 로직을 실행합니다. 예시로 진행 상태를 업데이트하는 코드를 넣었습니다.
-//                    for (i in 1..100) {
-//                        Thread.sleep(50) // 이미지 처리를 시뮬레이션하기 위한 딜레이
-//
-//                        // UI 스레드에서 ProgressBar 업데이트
-//                        Handler(Looper.getMainLooper()).post {
-//                            progressBar.progress = i
-//                        }
-//                    }
-//
-//                    // 이미지 처리가 끝나면 ProgressBar를 숨깁니다.
-//                    Handler(Looper.getMainLooper()).post {
-//                        progressBar.isVisible = false
-//                        Toast.makeText(context, "이미지 처리가 완료되었습니다.", Toast.LENGTH_SHORT).show()
-//                    }
-//                }.start()
-//            }
-//        }
+         */
 
 
         toggleFilterBtn.setOnTouchListener { _, event ->
