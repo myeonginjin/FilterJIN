@@ -3,6 +3,7 @@ package com.example.filterjin
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.AlertDialog
+import android.app.Dialog
 import android.app.ProgressDialog
 import android.content.ContentValues
 import android.content.Context
@@ -24,6 +25,7 @@ import android.view.MotionEvent
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.HorizontalScrollView
+import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.Toast
@@ -38,6 +40,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
@@ -71,7 +74,7 @@ class MainLayout(
 
 
     private val coroutineScope = CoroutineScope(Dispatchers.Main)
-    private lateinit var progressDialog: AlertDialog
+    private lateinit var progressDialog: Dialog
     private var imageProcessingJob: Job? = null // 이미지 처리 작업을 관리할 Job 변수
 
 
@@ -94,21 +97,17 @@ class MainLayout(
         createProgressDialog()
     }
     private fun createProgressDialog() {
-        val progressBar = ProgressBar(context).apply {
-            isIndeterminate = true
-            setPadding(30, 30, 30, 30)
-        }
+        progressDialog = Dialog(context).apply {
+            setContentView(R.layout.custom_progress_dialog) // 커스텀 레이아웃 설정
+            setCancelable(false) // 뒤로 가기 버튼으로 취소 불가능하도록 설정
 
-        val builder = AlertDialog.Builder(context).apply {
-            setView(progressBar)
-            setMessage("이미지 저장 중...")
-            setCancelable(false)
-            setNegativeButton("취소") { dialog, _ ->
+            // 취소 버튼 리스너 설정
+            val closeButton = findViewById<ImageView>(R.id.closeButton)
+            closeButton.setOnClickListener {
+                dismiss() // 다이얼로그 먼저 닫기
                 imageProcessingJob?.cancel() // 이미지 처리 작업 취소
-                dialog.dismiss()
             }
         }
-        progressDialog = builder.create()
     }
 
 
@@ -312,40 +311,48 @@ class MainLayout(
         }
 
 
-
         saveBtn.setOnClickListener {
-            // 이미지 처리 작업을 시작하기 전에 이전에 진행 중이던 작업이 있다면 취소합니다.
-            imageProcessingJob?.cancel()
+            // 이미지 처리 작업을 시작하기 전에 현재 시간을 기록합니다.
+            val startTime = System.currentTimeMillis()
 
-            // 새로운 코루틴 작업을 시작합니다.
             imageProcessingJob = coroutineScope.launch {
-                progressDialog.show() // 프로그레스 다이얼로그를 표시합니다.
-                val startTime = System.currentTimeMillis() // 현재 시간을 기록합니다.
+                try {
+                    progressDialog.show() // 프로그레스 다이얼로그 표시
+                    val processedBitmap = withContext(Dispatchers.Default) {
+                        // 이미지 처리 로직
+                        val image = imageViewManager.getCurrentImage()
+                        // 취소 가능한 지점 예시
+                        if (!isActive) return@withContext null // 취소 상태 확인
+                        // 이미지 처리 계속...
+                        image
+                    } ?: return@launch // 취소된 경우 여기서 종료
 
-                // 비동기적으로 이미지 처리 작업을 수행합니다.
-                val processedBitmap = withContext(Dispatchers.Default) {
-                    imageViewManager.getCurrentImage()
-                }
+                    // 이미지 저장 로직을 수행합니다. (Dispatchers.IO 사용 권장)
+                    withContext(Dispatchers.IO) {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                            saveImageOnAboveAndroidQ(processedBitmap)
+                        } else {
+                            saveImageOnUnderAndroidQ(processedBitmap)
+                        }
+                    }
 
-                // 이미지 저장 작업을 IO 스레드에서 수행합니다.
-                withContext(Dispatchers.IO) {
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                        saveImageOnAboveAndroidQ(processedBitmap)
+                    // 현재 시간과 작업 시작 시간의 차이를 계산합니다.
+                    val elapsedTime = System.currentTimeMillis() - startTime
+                    // 지정된 최소 시간(예: 1000ms) 동안 대기했는지 확인합니다.
+                    if (elapsedTime < 1000) {
+                        // 남은 시간만큼 대기합니다.
+                        delay(1000 - elapsedTime)
+                    }
+                } catch (e: Exception) {
+                    // 취소된 경우나 에러 발생 시 처리
+                } finally {
+                    progressDialog.dismiss()
+                    if (!isActive) {
+                        Toast.makeText(context, "이미지 처리가 취소되었습니다.", Toast.LENGTH_SHORT).show()
                     } else {
-                        saveImageOnUnderAndroidQ(processedBitmap)
+                        Toast.makeText(context, "이미지 저장 완료", Toast.LENGTH_SHORT).show()
                     }
                 }
-
-                // 작업의 총 소요 시간을 계산합니다.
-                val elapsedTime = System.currentTimeMillis() - startTime
-                // 작업 시간이 1초 미만이면, 최소 1초간 사용자에게 프로그레스바를 보여주기 위해 지연합니다.
-                if (elapsedTime < 1000) {
-                    delay(1000 - elapsedTime)
-                }
-
-                // 메인 스레드에서 UI 업데이트를 수행합니다.
-                progressDialog.dismiss() // 프로그레스 다이얼로그를 숨깁니다.
-                Toast.makeText(context, "이미지 저장이 완료되었습니다.", Toast.LENGTH_SHORT).show()
             }
         }
 
