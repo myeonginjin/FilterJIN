@@ -315,7 +315,9 @@ class MainLayout(
 
         saveBtn.setOnClickListener {
             progressDialog.show() // 프로그레스 다이얼로그 표시
+            val startTime = System.currentTimeMillis() // 처리 시작 시간 기록
             imageProcessingJob = coroutineScope.launch {
+
                 var processedBitmap: Bitmap? = null
                 try {
                     // 이미지 처리 로직 시작
@@ -359,6 +361,13 @@ class MainLayout(
                             }
                         }
                     }
+
+                    // 처리 완료 후 최소 표시 시간 보장 로직
+                    val elapsedTime = System.currentTimeMillis() - startTime
+                    if (elapsedTime < 1000) {
+                        delay(1000 - elapsedTime) // 최소 1초간 대기
+                    }
+
                 } catch (e: Exception) {
                     // 에러 처리
                 } finally {
