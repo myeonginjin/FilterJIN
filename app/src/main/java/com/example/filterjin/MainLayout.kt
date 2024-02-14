@@ -2,8 +2,12 @@ package com.example.filterjin
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.app.AlertDialog
+import android.app.Dialog
+import android.app.ProgressDialog
 import android.content.ContentValues
 import android.content.Context
+import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
@@ -21,6 +25,7 @@ import android.view.MotionEvent
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.HorizontalScrollView
+import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.Toast
@@ -30,6 +35,14 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.app.ActivityCompat
 import androidx.core.view.isVisible
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.FileOutputStream
@@ -60,10 +73,9 @@ class MainLayout(
     private val editBar = listViewManager.getEditBar()
 
 
-//    private val progressBar = ProgressBar(context, null, android.R.attr.progressBarStyleLarge).apply {
-//        isVisible = false // 초기에는 ProgressBar 숨기기
-//    }
-
+    private val coroutineScope = CoroutineScope(Dispatchers.Main)
+    private lateinit var progressDialog: Dialog
+    private var imageProcessingJob: Job? = null // 이미지 처리 작업을 관리할 Job 변수
 
 
 
@@ -72,7 +84,7 @@ class MainLayout(
     fun setImage(originBitmap: Bitmap, resizedBitmap : Bitmap, thumbnailBitmap: Bitmap) {
 
 
-        imageViewManager.setOriginImage(originBitmap)
+        imageViewManager.originImage = originBitmap
 
 
         imageViewManager.loadGalleryImage(resizedBitmap)
@@ -83,7 +95,22 @@ class MainLayout(
 
 
 
+    init {
+        createProgressDialog()
+    }
+    private fun createProgressDialog() {
+        progressDialog = Dialog(context).apply {
+            setContentView(R.layout.custom_progress_dialog) // 커스텀 레이아웃 설정
+            setCancelable(false) // 뒤로 가기 버튼으로 취소 불가능하도록 설정
 
+//            // 취소 버튼 리스너 설정
+//            val closeButton = findViewById<ImageView>(R.id.closeButton)
+//            closeButton.setOnClickListener {
+//                progressDialog.dismiss()  // 다이얼로그 먼저 닫기
+//                imageProcessingJob?.cancel() // 이미지 처리 작업 취소
+//            }
+        }
+    }
 
 
     private fun setupCategoryBar(): HorizontalScrollView {
@@ -126,21 +153,6 @@ class MainLayout(
     fun getMainLayout() : ConstraintLayout{
 
 
-//        progressBar.apply {
-//            val layoutParams = ConstraintLayout.LayoutParams(
-//                ConstraintLayout.LayoutParams.WRAP_CONTENT,
-//                ConstraintLayout.LayoutParams.WRAP_CONTENT
-//            )
-//            layoutParams.apply {
-//                topToTop = ConstraintSet.PARENT_ID
-//                bottomToBottom = ConstraintSet.PARENT_ID
-//                startToStart = ConstraintSet.PARENT_ID
-//                endToEnd = ConstraintSet.PARENT_ID
-//            }
-//            this.layoutParams = layoutParams
-//            id = ConstraintLayout.generateViewId()
-//        }
-//        mainFrame.addView(progressBar)
 
         mainFrame.apply {
             layoutParams = ViewGroup.LayoutParams(
@@ -301,8 +313,80 @@ class MainLayout(
         }
 
 
+        saveBtn.setOnClickListener {
+            progressDialog.show() // 프로그레스 다이얼로그 표시
+            val startTime = System.currentTimeMillis() // 처리 시작 시간 기록
+            imageProcessingJob = coroutineScope.launch {
+
+                var processedBitmap: Bitmap? = null
+                try {
+                    // 이미지 처리 로직 시작
+                    processedBitmap = withContext(Dispatchers.Default) {
+                        // 이미지 처리 로직
+                        val currentFilterType = imageViewManager.currentFilterType
+                        val originImage = imageViewManager.originImage
+                        when (currentFilterType) {
+                            "Ratio" -> {
+                                ImageProcessor.applyRatioFilter(
+                                    originalBitmap = originImage,
+                                    rRatio = imageViewManager.currentFilterR,
+                                    gRatio = imageViewManager.currentFilterG,
+                                    bRatio = imageViewManager.currentFilterB
+                                ).also {
+                                    // 취소 상태 확인
+                                    if (!isActive) return@withContext null
+                                }
+                            }
+                            "LUT" -> {
+                                val lutBitmap = BitmapFactory.decodeStream(context.assets.open(imageViewManager.currentLUTName!!))
+                                ImageProcessor.applyLutToBitmap(originImage, lutBitmap).also {
+                                    // 취소 상태 확인
+                                    if (!isActive) return@withContext null
+                                }
+                            }
+                            else -> originImage
+                        }
+                    }
+
+                    // 이미지 저장 로직
+                    processedBitmap?.let {
+                        withContext(Dispatchers.IO) {
+                            // 취소 상태 확인
+                            if (!isActive) return@withContext
+
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                                saveImageOnAboveAndroidQ(it)
+                            } else {
+                                saveImageOnUnderAndroidQ(it)
+                            }
+                        }
+                    }
+
+                    // 처리 완료 후 최소 표시 시간 보장 로직
+                    val elapsedTime = System.currentTimeMillis() - startTime
+                    if (elapsedTime < 1000) {
+                        delay(1000 - elapsedTime) // 최소 1초간 대기
+                    }
+
+                } catch (e: Exception) {
+                    // 에러 처리
+                } finally {
+                    withContext(Dispatchers.Main) {
+                        progressDialog.dismiss()
+                        if (!isActive) {
+                            Toast.makeText(context, "이미지 처리가 취소되었습니다.", Toast.LENGTH_SHORT).show()
+                        } else {
+                            processedBitmap?.let {
+                                Toast.makeText(context, "이미지 저장 완료", Toast.LENGTH_SHORT).show()
+                            } ?: Toast.makeText(context, "이미지 처리 실패", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                }
+            }
+        }
 
 
+        /*
         saveBtn.setOnClickListener {
 
             Toast.makeText(context, "saveBtn tapped", Toast.LENGTH_SHORT).show()
@@ -334,33 +418,7 @@ class MainLayout(
             }
         }
 
-//        @SuppressLint("ClickableViewAccessibility")
-//        fun setupSaveButtonWithBackgroundProcessing() {
-//            saveBtn.setOnClickListener {
-//                // 프로그레스바를 보이게 하고, 최대 값 설정
-//                progressBar.isVisible = true
-//                progressBar.max = 100
-//                progressBar.progress = 0
-//
-//                Thread {
-//                    // 여기서 이미지 처리 로직을 실행합니다. 예시로 진행 상태를 업데이트하는 코드를 넣었습니다.
-//                    for (i in 1..100) {
-//                        Thread.sleep(50) // 이미지 처리를 시뮬레이션하기 위한 딜레이
-//
-//                        // UI 스레드에서 ProgressBar 업데이트
-//                        Handler(Looper.getMainLooper()).post {
-//                            progressBar.progress = i
-//                        }
-//                    }
-//
-//                    // 이미지 처리가 끝나면 ProgressBar를 숨깁니다.
-//                    Handler(Looper.getMainLooper()).post {
-//                        progressBar.isVisible = false
-//                        Toast.makeText(context, "이미지 처리가 완료되었습니다.", Toast.LENGTH_SHORT).show()
-//                    }
-//                }.start()
-//            }
-//        }
+         */
 
 
         toggleFilterBtn.setOnTouchListener { _, event ->
