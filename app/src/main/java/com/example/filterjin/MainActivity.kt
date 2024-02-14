@@ -28,6 +28,7 @@ class MainActivity : AppCompatActivity() {
                     if (result.resultCode == Activity.RESULT_OK) {
                         val imageUri = result.data?.data
                         if (imageUri != null) {
+
                             // 원본 이미지 로드 및 회전 처리
                             var rotatedOriginalBitmap: Bitmap? = null
                             contentResolver.openInputStream(imageUri)?.use { inputStream ->

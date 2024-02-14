@@ -39,7 +39,9 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.util.TypedValueCompat.dpToPx
 import androidx.core.view.isVisible
+import androidx.core.view.marginBottom
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -80,6 +82,7 @@ class MainLayout(
     //ListViewManager클래스로 RecyclerView 동적구현
     private val editBar = listViewManager.getEditBar()
 
+    private val bottomBar = setupBottomBar()
 
     private val coroutineScope = CoroutineScope(Dispatchers.Main)
     private lateinit var progressDialog: Dialog
@@ -170,6 +173,18 @@ class MainLayout(
         }
     }
 
+    private fun setupBottomBar(): ConstraintLayout {
+        // bottomBar 레이아웃 생성
+        val bottomBarLayout = ConstraintLayout(context).apply {
+
+            layoutParams = ConstraintLayout.LayoutParams(
+                ConstraintLayout.LayoutParams.MATCH_PARENT,
+                ConstraintLayout.LayoutParams.WRAP_CONTENT
+            )
+            setBackgroundColor(Color.parseColor("#424242"))
+        }
+        return bottomBarLayout
+    }
 
 
     @SuppressLint("ClickableViewAccessibility")
@@ -309,20 +324,24 @@ class MainLayout(
         imageViewFrame.addView(imageView)
 
 
+
+        bottomBar.apply {
+            id = ConstraintLayout.generateViewId()
+        }
+        mainFrame.addView(bottomBar)
+
+
         categoryBar.apply {
             id = ConstraintLayout.generateViewId()
         }
-        mainFrame.addView(categoryBar)
+        bottomBar.addView(categoryBar)
 
 
 
         editBar.apply {
             id = ConstraintLayout.generateViewId()
         }
-        mainFrame.addView(editBar)
-
-
-
+        bottomBar.addView(editBar)
 
 
 
@@ -331,7 +350,7 @@ class MainLayout(
             clone(mainFrame)
 
 
-            connect(topTabBar.id, ConstraintSet.TOP, ConstraintSet.PARENT_ID, ConstraintSet.TOP,24)
+            connect(topTabBar.id, ConstraintSet.TOP, ConstraintSet.PARENT_ID, ConstraintSet.TOP,32)
 
 
             applyTo(mainFrame)
@@ -359,7 +378,7 @@ class MainLayout(
             clone(mainFrame)
 
             connect(imageViewFrame.id, ConstraintSet.TOP, topTabBar.id, ConstraintSet.BOTTOM, 8)
-            connect(imageViewFrame.id, ConstraintSet.BOTTOM, categoryBar.id, ConstraintSet.TOP, 24)
+            connect(imageViewFrame.id, ConstraintSet.BOTTOM, bottomBar.id, ConstraintSet.TOP, 24)
             connect(imageViewFrame.id, ConstraintSet.START, ConstraintSet.PARENT_ID, ConstraintSet.START,8)
             connect(imageViewFrame.id, ConstraintSet.END, ConstraintSet.PARENT_ID, ConstraintSet.END,8)
 
@@ -367,30 +386,55 @@ class MainLayout(
             applyTo(mainFrame)
         }
 
+//        ConstraintSet().apply {
+//            clone(mainFrame)
+//
+//            connect(categoryBar.id, ConstraintSet.BOTTOM, editBar.id, ConstraintSet.TOP, 0)
+//            connect(categoryBar.id, ConstraintSet.START, ConstraintSet.PARENT_ID, ConstraintSet.START,0)
+//            connect(categoryBar.id, ConstraintSet.END, ConstraintSet.PARENT_ID, ConstraintSet.END,0)
+//
+//
+//            applyTo(mainFrame)
+//        }
+//
+//        ConstraintSet().apply {
+//            clone(mainFrame)
+//
+//            connect(editBar.id, ConstraintSet.BOTTOM, ConstraintSet.PARENT_ID, ConstraintSet.BOTTOM, 104)
+//            connect(editBar.id, ConstraintSet.START, ConstraintSet.PARENT_ID, ConstraintSet.START,8)
+//            connect(editBar.id, ConstraintSet.END, ConstraintSet.PARENT_ID, ConstraintSet.END, 8)
+//
+//
+//            applyTo(mainFrame)
+//        }
+
+        ConstraintSet().apply {
+            clone(bottomBar)
+
+            // categoryBar를 bottomBar의 상단에 위치시키고 상단 마진 설정
+            connect(categoryBar.id, ConstraintSet.TOP, ConstraintSet.PARENT_ID, ConstraintSet.TOP, 8) // 여기서 dpToPx는 dp 단위를 픽셀로 변환하는 함수입니다.
+
+            // editBar를 bottomBar의 하단에 위치시키고 하단 마진 설정
+            connect(editBar.id, ConstraintSet.TOP, categoryBar.id, ConstraintSet.BOTTOM, 8)
+
+            // 추가적으로 categoryBar와 editBar 사이의 제약 조건을 설정할 수 있습니다.
+            connect(editBar.id, ConstraintSet.BOTTOM, ConstraintSet.PARENT_ID, ConstraintSet.BOTTOM, 40)
+
+            applyTo(bottomBar)
+
+        }
+
+
         ConstraintSet().apply {
             clone(mainFrame)
 
-            connect(categoryBar.id, ConstraintSet.BOTTOM, editBar.id, ConstraintSet.TOP, 0)
-            connect(categoryBar.id, ConstraintSet.START, ConstraintSet.PARENT_ID, ConstraintSet.START,0)
-            connect(categoryBar.id, ConstraintSet.END, ConstraintSet.PARENT_ID, ConstraintSet.END,0)
+            connect(bottomBar.id, ConstraintSet.BOTTOM, ConstraintSet.PARENT_ID, ConstraintSet.BOTTOM, 128)
+            connect(bottomBar.id, ConstraintSet.START, ConstraintSet.PARENT_ID, ConstraintSet.START,8)
+            connect(bottomBar.id, ConstraintSet.END, ConstraintSet.PARENT_ID, ConstraintSet.END,8)
 
 
             applyTo(mainFrame)
         }
-
-        ConstraintSet().apply {
-            clone(mainFrame)
-
-            connect(editBar.id, ConstraintSet.BOTTOM, ConstraintSet.PARENT_ID, ConstraintSet.BOTTOM, 104)
-            connect(editBar.id, ConstraintSet.START, ConstraintSet.PARENT_ID, ConstraintSet.START,8)
-            connect(editBar.id, ConstraintSet.END, ConstraintSet.PARENT_ID, ConstraintSet.END, 8)
-
-
-            applyTo(mainFrame)
-        }
-
-
-
 
 
         galleryBtn.setOnClickListener {
