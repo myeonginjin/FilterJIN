@@ -22,10 +22,8 @@ class FilterAdapter(var filterItemList: List<FilterItem>):
         return FilterViewHolder(view)
     }
     override fun onBindViewHolder(holder: FilterViewHolder, position: Int) {
-        holder.tv_time.text = filterItemList[position].id.toString()
-        holder.tv_title.text = filterItemList[position].name
-        holder.tv_img.setImageBitmap(filterItemList[position].thumbnail)
-        holder.tv_name.text = filterItemList[position].category
+        holder.itemImg.setImageBitmap(filterItemList[position].thumbnail)
+        holder.filterName.text = filterItemList[position].name
     }
 
     override fun getItemCount(): Int {
@@ -36,10 +34,8 @@ class FilterAdapter(var filterItemList: List<FilterItem>):
 
 
     inner class FilterViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val tv_time = itemView.findViewById<TextView>(R.id.tv_time)
-        val tv_title = itemView.findViewById<TextView>(R.id.tv_title)
-        val tv_img = itemView.findViewById<ImageView>(R.id.userImg)
-        val tv_name = itemView.findViewById<TextView>(R.id.tv_name)
+        val itemImg = itemView.findViewById<ImageView>(R.id.userImg)
+        val filterName = itemView.findViewById<TextView>(R.id.filter_name)
 
         init {
 

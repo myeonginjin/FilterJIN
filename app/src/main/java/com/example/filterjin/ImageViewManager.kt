@@ -13,7 +13,7 @@ class ImageViewManager (private val context : Context){
     private var defaultImage : Bitmap = BitmapFactory.decodeResource(context.resources, R.drawable.default_image)
     var originImage : Bitmap = defaultImage
     var resizedImage : Bitmap = defaultImage
-    private var currentViewImage : Bitmap = defaultImage
+    var currentViewImage : Bitmap = defaultImage
     var currentFilterType: String? = null
     var currentFilterName: String? = null
     var currentLUTName: String? = null
