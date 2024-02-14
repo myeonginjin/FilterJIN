@@ -109,7 +109,35 @@ class MainLayout(
 
     init {
         createProgressDialog()
+        setupGalleryButtonWithTooltip()
     }
+
+
+    private fun setupGalleryButtonWithTooltip() {
+        // SharedPreferences를 사용하여 최초 클릭 여부 확인
+        val sharedPreferences = context.getSharedPreferences("AppPreferences", Context.MODE_PRIVATE)
+        val isFirstLaunch = sharedPreferences.getBoolean("isFirstGalleryClick", true)
+
+        if (isFirstLaunch) {
+            // 최초 클릭 시 안내 말풍선 표시
+            galleryBtn.post { // 뷰가 완전히 로드된 후에 Toast 메시지를 표시
+                Toast.makeText(context, "사진을 불러와주세요", Toast.LENGTH_LONG).show()
+            }
+            // SharedPreferences 업데이트
+            with(sharedPreferences.edit()) {
+                putBoolean("isFirstGalleryClick", false)
+                apply()
+            }
+        }
+
+        galleryBtn.setOnClickListener {
+            // 기존 갤러리 런처 코드
+            val intent = Intent(Intent.ACTION_PICK)
+            intent.type = "image/*"
+            galleryLauncher?.launch(intent)
+        }
+    }
+
     private fun createProgressDialog() {
         progressDialog = Dialog(context).apply {
             setContentView(R.layout.custom_progress_dialog) // 커스텀 레이아웃 설정
@@ -558,7 +586,7 @@ class MainLayout(
                     // 사용자가 버튼을 꾹 누르고 있을 때의 동작
                     // 원본 이미지 표시
                     Log.i("test44","?@")
-                    Toast.makeText(context,"tapped",Toast.LENGTH_SHORT).show()
+//                    Toast.makeText(context,"tapped",Toast.LENGTH_SHORT).show()
                     imageViewManager.toggleImage(true)
 
                     true // 이벤트 처리 완료
@@ -566,7 +594,7 @@ class MainLayout(
                 MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
                     // 사용자가 버튼에서 손을 떼거나 취소했을 때의 동작
                     // 필터 적용된 이미지 표시
-                    Toast.makeText(context,"no tapped",Toast.LENGTH_SHORT).show()
+//                    Toast.makeText(context,"no tapped",Toast.LENGTH_SHORT).show()
                     imageViewManager.toggleImage(false)
 
                     true // 이벤트 처리 완료
