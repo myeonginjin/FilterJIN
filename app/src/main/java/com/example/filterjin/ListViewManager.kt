@@ -4,12 +4,17 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.util.Log
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.view.marginBottom
 import androidx.core.view.marginTop
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class ListViewManager (private val context : Context,  private val mainLayout: MainLayout , private val imageViewManager : ImageViewManager) {
     private  val editBar = RecyclerView(context)
@@ -68,42 +73,55 @@ class ListViewManager (private val context : Context,  private val mainLayout: M
                 val item = itemList[position]
 //                Toast.makeText(context, "${item.name} 클릭함", Toast.LENGTH_SHORT).show()
 
+                // 메소드 실행 전 시간 측정
+                val startTime = System.nanoTime()
+
+                // 메소드 실행
                 imageViewManager.applyFilter(item)
+
+                // 메소드 실행 후 시간 측정
+                val endTime = System.nanoTime()
+
+                // 실행 시간 계산 (나노초 단위)
+                val duration = (endTime - startTime) / 1_000_000_000.0 // 초 단위로 변환
+
+                // 로그로 실행 시간 출력
+                Log.i("Performance", "${item.name} 필터 적용 시간: $duration ms")
             }
         }
         return  editBar
     }
 
     @SuppressLint("NotifyDataSetChanged")
-    fun setCurrentItemImage (bitmap: Bitmap) {
-        itemList.forEach { item ->
+    fun setCurrentItemImage(bitmap: Bitmap) {
+        // Coroutine 시작
+        CoroutineScope(Dispatchers.IO).launch {
+            itemList.forEach { item ->
+                when (item.type) {
+                    "Ratio" -> {
+                        item.updateThumbnail(ImageProcessor.applyRatioFilter(bitmap, item.rRatio, item.gRatio, item.bRatio))
+                    }
+                    "LUT" -> {
+                        lateinit var lutBitmap: Bitmap
+                        val assetManager = context.resources.assets
+                        val fileName: String = item.lut
 
+                        val inputStreamLUT = assetManager.open(fileName)
+                        lutBitmap = BitmapFactory.decodeStream(inputStreamLUT)
 
-            if (item.type == "Ratio") {
-                item.updateThumbnail(ImageProcessor.applyRatioFilter(bitmap, item.rRatio, item.gRatio , item.bRatio))
+                        item.updateThumbnail(ImageProcessor.applyLutToBitmap(bitmap, lutBitmap))
+                    }
+                    else -> {
+                        item.updateThumbnail(bitmap)
+                    }
+                }
             }
 
-            else if(item.type == "LUT") {
-                lateinit var lutBitmap: Bitmap
-                val assetManager = context.resources.assets
-                val fileName : String = item.lut
-
-
-                val inputStreamLUT = assetManager.open(fileName)
-                lutBitmap = BitmapFactory.decodeStream(inputStreamLUT)
-
-
-
-                item.updateThumbnail(ImageProcessor.applyLutToBitmap(bitmap , lutBitmap))
-            }
-
-            else {
-                item.updateThumbnail(bitmap)
+            // 메인 스레드로 전환하여 UI 업데이트
+            withContext(Dispatchers.Main) {
+                // 어댑터와 리사이클러뷰 갱신
+                filterAdapter.notifyDataSetChanged()
             }
         }
-
-
-        //어뎁터와 리싸이클러 뷰 갱신
-        filterAdapter.notifyDataSetChanged()
     }
 }

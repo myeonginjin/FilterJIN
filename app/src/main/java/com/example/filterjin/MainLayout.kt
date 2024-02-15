@@ -169,6 +169,7 @@ class MainLayout(
             )
         }
         val categories = listOf("ALL") + listViewManager.getUniqueCategories()
+
         setupCategoryButtons(categories, categoryList)
         horizontalScrollView.addView(categoryList) // LinearLayout을 HorizontalScrollView에 추가
         return horizontalScrollView
@@ -182,15 +183,15 @@ class MainLayout(
                 text = category
                 setBackgroundColor(Color.TRANSPARENT) // 버튼 배경을 투명하게 설정
                 setTextColor(Color.WHITE) // 텍스트 색상을 흰색으로 설정
-                textSize = 16f // 텍스트 크기 설정
+                textSize = 12f // 텍스트 크기 설정
 
                 // "Roboto Medium" 폰트 스타일 적용
-                typeface = Typeface.create("sans-serif-medium", Typeface.NORMAL)
+                typeface = Typeface.create("sans-serif-light", Typeface.NORMAL)
 
-                val paddingInDp = 8 // dp 단위
-                val density = context.resources.displayMetrics.density
-                val paddingInPx = (paddingInDp * density).toInt()
-                setPadding(paddingInPx, paddingInPx, paddingInPx, paddingInPx)
+//                val paddingInDp = 8 // dp 단위
+//                val density = context.resources.displayMetrics.density
+//                val paddingInPx = (paddingInDp * density).toInt()
+//                setPadding(paddingInPx, paddingInPx, paddingInPx, paddingInPx)
 
                 setOnClickListener {
                     // 선택된 카테고리의 첫 아이템으로 스크롤하는 로직 등 구현
@@ -338,7 +339,7 @@ class MainLayout(
 
         imageViewFrame.apply {
             layoutParams = ConstraintLayout.LayoutParams(
-                ConstraintLayout.LayoutParams.MATCH_PARENT,
+                ConstraintLayout.LayoutParams.MATCH_CONSTRAINT,
                 ConstraintLayout.LayoutParams.MATCH_CONSTRAINT
             )
             id = ConstraintLayout.generateViewId()

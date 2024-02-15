@@ -10,6 +10,7 @@ import android.media.ExifInterface
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 
@@ -21,7 +22,35 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        //카메라 앱 엑티비티에서 돌아올 때 안드로이드 시스템의 의해 ActivityResultCallback의 onActivity()함수 자동 실행
+
+        fun resizeBitmapMaintainingAspectRatio(originalBitmap: Bitmap, maxSize: Int): Bitmap {
+            val width = originalBitmap.width
+            val height = originalBitmap.height
+
+            val ratio: Float = width.toFloat() / height.toFloat()
+            var finalWidth = width
+            var finalHeight = height
+
+            // 장축 기준으로 크기 조정
+            if (width >= height) {
+                // 너비가 높이보다 크거나 같은 경우
+                if (width > maxSize) {
+                    finalWidth = maxSize
+                    finalHeight = (maxSize / ratio).toInt()
+                }
+            } else {
+                // 높이가 너비보다 큰 경우
+                if (height > maxSize) {
+                    finalHeight = maxSize
+                    finalWidth = (maxSize * ratio).toInt()
+                }
+            }
+
+            return Bitmap.createScaledBitmap(originalBitmap, finalWidth, finalHeight, true)
+        }
+
+
+
         galleryLauncher =
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
                 try {
@@ -29,58 +58,38 @@ class MainActivity : AppCompatActivity() {
                         val imageUri = result.data?.data
                         if (imageUri != null) {
 
+                            lateinit var originalBitmap : Bitmap
+
                             // 원본 이미지 로드 및 회전 처리
-                            var rotatedOriginalBitmap: Bitmap? = null
+                            lateinit var rotatedOriginalBitmap: Bitmap
+
                             contentResolver.openInputStream(imageUri)?.use { inputStream ->
-                                val originalBitmap = BitmapFactory.decodeStream(inputStream)
+                                originalBitmap = BitmapFactory.decodeStream(inputStream)
                                 rotatedOriginalBitmap = rotateImageIfRequired(this, originalBitmap, imageUri)
                             }
 
-                            // 리사이징 작업 및 리사이징된 이미지의 회전 처리
-                            var rotatedResizedBitmap: Bitmap? = null
-                            contentResolver.openInputStream(imageUri)?.use { inputStream ->
-                                // 적절한 inSampleSize 계산
-                                val options = BitmapFactory.Options().apply { inJustDecodeBounds = true }
-                                BitmapFactory.decodeStream(inputStream, null, options)
-                                val calRatio = calculateSampleSize(
-                                    options,
-                                    resources.getDimensionPixelSize(R.dimen.imgSize),
-                                    resources.getDimensionPixelSize(R.dimen.imgSize)
-                                )
-                                // 실제 리사이징을 위해 inSampleSize 설정
-                                options.apply {
-                                    inJustDecodeBounds = false
-                                    inSampleSize = calRatio
-                                }
-                                // 리사이징된 이미지 생성
-                                val resizedBitmap = BitmapFactory.decodeStream(contentResolver.openInputStream(imageUri), null, options)
-                                rotatedResizedBitmap = resizedBitmap?.let { rotateImageIfRequired(this, it, imageUri) }
-                            }
+                            // 리사이징 작업 및 리사이징된 이미지의 회전 처리 (보간 작업 포함)
+//                            var rotatedResizedBitmap: Bitmap? = null
+                            // 리사이징 작업 및 리사이징된 이미지의 회전 처리 (보간 작업 포함)
 
-                            var rotatedResizedThumbnail: Bitmap? = null
-                            contentResolver.openInputStream(imageUri)?.use { inputStream ->
-                                // 적절한 inSampleSize 계산
-                                val options = BitmapFactory.Options().apply { inJustDecodeBounds = true }
-                                BitmapFactory.decodeStream(inputStream, null, options)
-                                val calRatio = calculateSampleSize(
-                                    options,
-                                    100,
-                                    100
-                                )
-                                // 실제 리사이징을 위해 inSampleSize 설정
-                                options.apply {
-                                    inJustDecodeBounds = false
-                                    inSampleSize = calRatio
-                                }
-                                // 리사이징된 이미지 생성
-                                val resizedBitmap = BitmapFactory.decodeStream(contentResolver.openInputStream(imageUri), null, options)
-                                rotatedResizedThumbnail = resizedBitmap?.let { rotateImageIfRequired(this, it, imageUri) }
-                            }
+
+                                // 장축을 680 픽셀로 고정하여 리사이징
+                                val rotatedResizedBitmap = resizeBitmapMaintainingAspectRatio(rotatedOriginalBitmap, 800)
+//                                rotatedResizedBitmap = rotateImageIfRequired(this, resizedBitmap, imageUri)
+
+                                Log.i("sizeT" , " w : ${rotatedResizedBitmap.width}  h : ${rotatedResizedBitmap.height}" )
+
+
+
+                                // 썸네일도 동일한 로직을 적용하여 리사이징
+                                val rotatedResizedThumbnail = resizeBitmapMaintainingAspectRatio(rotatedOriginalBitmap, 150) // 여기서 680을 다른 값으로 조정할 수 있음
+                                Log.i("sizeT" , " w : ${rotatedResizedThumbnail.width}  h : ${rotatedResizedThumbnail.height}" )
+
 
                             // MainLayout에 원본 및 리사이징된 이미지 설정
-                            if (rotatedOriginalBitmap != null && rotatedResizedBitmap != null) {
-                                mainLayout.setImage(rotatedOriginalBitmap!!, rotatedResizedBitmap!!, rotatedResizedThumbnail!!)
-                            }
+                            mainLayout.setImage(rotatedOriginalBitmap, rotatedResizedBitmap,
+                                rotatedResizedThumbnail
+                            )
                         }
                     }
                 } catch (e: Exception) {
@@ -117,20 +126,20 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-    private fun calculateSampleSize(options: BitmapFactory.Options, reqWidth: Int, reqHeight: Int): Int {
-        val (height: Int, width: Int) = options.run { outHeight to outWidth }
-        var inSampleSize = 1
-
-        if (height > reqHeight || width > reqWidth) {
-            val halfHeight: Int = height / 2
-            val halfWidth: Int = width / 2
-
-            while (halfHeight / inSampleSize >= reqHeight && halfWidth / inSampleSize >= reqWidth) {
-                inSampleSize *= 2
-            }
-        }
-        return inSampleSize
-    }
+//    private fun calculateSampleSize(options: BitmapFactory.Options, reqWidth: Int, reqHeight: Int): Int {
+//        val (height: Int, width: Int) = options.run { outHeight to outWidth }
+//        var inSampleSize = 1
+//
+//        if (height > reqHeight || width > reqWidth) {
+//            val halfHeight: Int = height / 2
+//            val halfWidth: Int = width / 2
+//
+//            while (halfHeight / inSampleSize >= reqHeight && halfWidth / inSampleSize >= reqWidth) {
+//                inSampleSize *= 2
+//            }
+//        }
+//        return inSampleSize
+//    }
 
 
 
