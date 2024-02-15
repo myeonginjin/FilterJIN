@@ -10,9 +10,12 @@ import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.content.res.ColorStateList
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Color
+import android.graphics.Typeface
+import android.graphics.drawable.GradientDrawable
 import android.net.Uri
 import android.os.Build
 import android.os.Environment
@@ -21,6 +24,7 @@ import android.os.Looper
 import android.provider.MediaStore
 import android.service.controls.templates.ThumbnailTemplate
 import android.util.Log
+import android.view.Gravity
 import android.view.MotionEvent
 import android.view.ViewGroup
 import android.widget.Button
@@ -34,7 +38,10 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+import androidx.core.util.TypedValueCompat.dpToPx
 import androidx.core.view.isVisible
+import androidx.core.view.marginBottom
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -68,10 +75,14 @@ class MainLayout(
     private val imageViewFrame = LinearLayout(context)
 
     private val imageView = imageViewManager.getImageView()
+
+//    private val bottomBar = setupBottomBar()
+
     private val categoryBar = setupCategoryBar()
     //ListViewManager클래스로 RecyclerView 동적구현
     private val editBar = listViewManager.getEditBar()
 
+    private val bottomBar = setupBottomBar()
 
     private val coroutineScope = CoroutineScope(Dispatchers.Main)
     private lateinit var progressDialog: Dialog
@@ -90,6 +101,7 @@ class MainLayout(
         imageViewManager.loadGalleryImage(resizedBitmap)
 
 
+
         listViewManager.setCurrentItemImage(thumbnailBitmap)
     }
 
@@ -97,7 +109,35 @@ class MainLayout(
 
     init {
         createProgressDialog()
+        setupGalleryButtonWithTooltip()
     }
+
+
+    private fun setupGalleryButtonWithTooltip() {
+        // SharedPreferences를 사용하여 최초 클릭 여부 확인
+        val sharedPreferences = context.getSharedPreferences("AppPreferences", Context.MODE_PRIVATE)
+        val isFirstLaunch = sharedPreferences.getBoolean("isFirstGalleryClick", true)
+
+        if (isFirstLaunch) {
+            // 최초 클릭 시 안내 말풍선 표시
+            galleryBtn.post { // 뷰가 완전히 로드된 후에 Toast 메시지를 표시
+                Toast.makeText(context, "사진을 불러와주세요", Toast.LENGTH_LONG).show()
+            }
+            // SharedPreferences 업데이트
+            with(sharedPreferences.edit()) {
+                putBoolean("isFirstGalleryClick", false)
+                apply()
+            }
+        }
+
+        galleryBtn.setOnClickListener {
+            // 기존 갤러리 런처 코드
+            val intent = Intent(Intent.ACTION_PICK)
+            intent.type = "image/*"
+            galleryLauncher?.launch(intent)
+        }
+    }
+
     private fun createProgressDialog() {
         progressDialog = Dialog(context).apply {
             setContentView(R.layout.custom_progress_dialog) // 커스텀 레이아웃 설정
@@ -119,6 +159,7 @@ class MainLayout(
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT
             )
+            isHorizontalScrollBarEnabled = false
         }
         val categoryList = LinearLayout(context).apply {
             orientation = LinearLayout.HORIZONTAL
@@ -139,13 +180,38 @@ class MainLayout(
         categories.forEach { category ->
             val button = Button(context).apply {
                 text = category
+                setBackgroundColor(Color.TRANSPARENT) // 버튼 배경을 투명하게 설정
+                setTextColor(Color.WHITE) // 텍스트 색상을 흰색으로 설정
+                textSize = 16f // 텍스트 크기 설정
+
+                // "Roboto Medium" 폰트 스타일 적용
+                typeface = Typeface.create("sans-serif-medium", Typeface.NORMAL)
+
+                val paddingInDp = 8 // dp 단위
+                val density = context.resources.displayMetrics.density
+                val paddingInPx = (paddingInDp * density).toInt()
+                setPadding(paddingInPx, paddingInPx, paddingInPx, paddingInPx)
+
                 setOnClickListener {
-                    // 선택된 카테고리의 첫 아이템으로 스크롤
+                    // 선택된 카테고리의 첫 아이템으로 스크롤하는 로직 등 구현
                     listViewManager.scrollToCategory(category)
                 }
             }
             categoryList.addView(button)
         }
+    }
+
+    private fun setupBottomBar(): ConstraintLayout {
+        // bottomBar 레이아웃 생성
+        val bottomBarLayout = ConstraintLayout(context).apply {
+
+            layoutParams = ConstraintLayout.LayoutParams(
+                ConstraintLayout.LayoutParams.MATCH_PARENT,
+                ConstraintLayout.LayoutParams.WRAP_CONTENT
+            )
+            setBackgroundColor(Color.parseColor("#424242"))
+        }
+        return bottomBarLayout
     }
 
 
@@ -159,8 +225,9 @@ class MainLayout(
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT
             )
-            setBackgroundColor(Color.WHITE)
+            setBackgroundColor( Color.parseColor("#2C2C2C"))
         }
+
 
 
         topTabBar.apply {
@@ -173,35 +240,98 @@ class MainLayout(
         mainFrame.addView(topTabBar)
 
 
+
+        val sizeInDp = 32
+        val density = context.resources.displayMetrics.density
+        val sizeInPx = (sizeInDp * density).toInt()
+
+
         galleryBtn.apply {
-            text = "Gallery"
-            layoutParams = ConstraintLayout.LayoutParams(
-                ConstraintLayout.LayoutParams.WRAP_CONTENT,
-                ConstraintLayout.LayoutParams.WRAP_CONTENT
-            )
+            val iconSize = (24 * context.resources.displayMetrics.density).toInt() // 아이콘 크기를 24dp로 설정
+            val padding = (sizeInPx - iconSize) / 2 // 아이콘을 중앙에 위치시키기 위한 패딩 계산
+
+            layoutParams = ConstraintLayout.LayoutParams(sizeInPx, sizeInPx).apply {
+                setMargins(8, 8, 8, 8) // 버튼 마진 설정
+            }
             id = ConstraintLayout.generateViewId()
+
+            // 버튼의 배경으로 둥근 모서리 설정
+            val backgroundDrawable = GradientDrawable().apply {
+                shape = GradientDrawable.RECTANGLE
+                setColor(Color.DKGRAY) // 버튼의 배경색 설정
+                cornerRadius = 12 * context.resources.displayMetrics.density // 둥근 모서리 반지름 설정
+            }
+            background = backgroundDrawable
+
+            // 아이콘 Drawable 가져오기 및 설정
+            val drawable = ContextCompat.getDrawable(context, R.drawable.baseline_image_search_24)?.apply {
+                setBounds(0, 0, iconSize, iconSize) // 아이콘 크기 설정
+                setTint(Color.WHITE) // 아이콘 색상을 흰색으로 설정
+            }
+            setCompoundDrawablesWithIntrinsicBounds(drawable, null, null, null)
+            setPadding(padding, padding, padding, padding) // 아이콘을 중앙에 위치시키기 위한 패딩 설정
+            gravity = Gravity.CENTER // 내용 중앙 정렬
+            text = "" // 버튼 텍스트 없음
         }
         topTabBar.addView(galleryBtn)
 
 
         toggleFilterBtn.apply {
-            text = "toggle"
-            layoutParams = ConstraintLayout.LayoutParams(
-                ConstraintLayout.LayoutParams.WRAP_CONTENT,
-                ConstraintLayout.LayoutParams.WRAP_CONTENT
-            )
+            val iconSize = (24 * context.resources.displayMetrics.density).toInt() // 아이콘 크기를 24dp로 설정
+            val padding = (sizeInPx - iconSize) / 2 // 아이콘을 중앙에 위치시키기 위한 패딩 계산
+
+            layoutParams = ConstraintLayout.LayoutParams(sizeInPx, sizeInPx).apply {
+                setMargins(8, 8, 8, 8) // 버튼 마진 설정
+            }
             id = ConstraintLayout.generateViewId()
+
+            // 버튼의 배경으로 둥근 모서리 설정
+            val backgroundDrawable = GradientDrawable().apply {
+                shape = GradientDrawable.RECTANGLE
+                setColor(Color.DKGRAY) // 버튼의 배경색 설정
+                cornerRadius = 12 * context.resources.displayMetrics.density // 둥근 모서리 반지름 설정
+            }
+            background = backgroundDrawable
+
+            // 아이콘 Drawable 가져오기 및 설정
+            val drawable = ContextCompat.getDrawable(context, R.drawable.baseline_autorenew_24)?.apply {
+                setBounds(0, 0, iconSize, iconSize) // 아이콘 크기 설정
+                setTint(Color.WHITE) // 아이콘 색상을 흰색으로 설정
+            }
+            setCompoundDrawablesWithIntrinsicBounds(drawable, null, null, null)
+            setPadding(padding, padding, padding, padding) // 아이콘을 중앙에 위치시키기 위한 패딩 설정
+            gravity = Gravity.CENTER // 내용 중앙 정렬
+            text = "" // 버튼 텍스트 없음
         }
         topTabBar.addView(toggleFilterBtn)
 
 
         saveBtn.apply {
-            text = "Save"
-            layoutParams = ConstraintLayout.LayoutParams(
-                ConstraintLayout.LayoutParams.WRAP_CONTENT,
-                ConstraintLayout.LayoutParams.WRAP_CONTENT
-            )
+            val iconSize = (24 * context.resources.displayMetrics.density).toInt() // 아이콘 크기를 24dp로 설정
+            val padding = (sizeInPx - iconSize) / 2 // 아이콘을 중앙에 위치시키기 위한 패딩 계산
+
+            layoutParams = ConstraintLayout.LayoutParams(sizeInPx, sizeInPx).apply {
+                setMargins(8, 8, 8, 8) // 버튼 마진 설정
+            }
             id = ConstraintLayout.generateViewId()
+
+            // 버튼의 배경으로 둥근 모서리 설정
+            val backgroundDrawable = GradientDrawable().apply {
+                shape = GradientDrawable.RECTANGLE
+                setColor(Color.DKGRAY) // 버튼의 배경색 설정
+                cornerRadius = 12 * context.resources.displayMetrics.density // 둥근 모서리 반지름 설정
+            }
+            background = backgroundDrawable
+
+            // 아이콘 Drawable 가져오기 및 설정
+            val drawable = ContextCompat.getDrawable(context, R.drawable.baseline_archive_24)?.apply {
+                setBounds(0, 0, iconSize, iconSize) // 아이콘 크기 설정
+                setTint(Color.WHITE) // 아이콘 색상을 흰색으로 설정
+            }
+            setCompoundDrawablesWithIntrinsicBounds(drawable, null, null, null)
+            setPadding(padding, padding, padding, padding) // 아이콘을 중앙에 위치시키기 위한 패딩 설정
+            gravity = Gravity.CENTER // 내용 중앙 정렬
+            text = "" // 버튼 텍스트 없음
         }
         topTabBar.addView(saveBtn)
 
@@ -222,19 +352,24 @@ class MainLayout(
         imageViewFrame.addView(imageView)
 
 
+
+        bottomBar.apply {
+            id = ConstraintLayout.generateViewId()
+        }
+        mainFrame.addView(bottomBar)
+
+
         categoryBar.apply {
             id = ConstraintLayout.generateViewId()
         }
-        mainFrame.addView(categoryBar)
+        bottomBar.addView(categoryBar)
 
 
 
         editBar.apply {
             id = ConstraintLayout.generateViewId()
         }
-        mainFrame.addView(editBar)
-
-
+        bottomBar.addView(editBar)
 
 
 
@@ -243,7 +378,7 @@ class MainLayout(
             clone(mainFrame)
 
 
-            connect(topTabBar.id, ConstraintSet.TOP, ConstraintSet.PARENT_ID, ConstraintSet.TOP,16)
+            connect(topTabBar.id, ConstraintSet.TOP, ConstraintSet.PARENT_ID, ConstraintSet.TOP,32)
 
 
             applyTo(mainFrame)
@@ -253,13 +388,13 @@ class MainLayout(
         ConstraintSet().apply {
             clone(topTabBar)
 
-            connect(galleryBtn.id, ConstraintSet.START, ConstraintSet.PARENT_ID, ConstraintSet.START, 16)
+            connect(galleryBtn.id, ConstraintSet.START, ConstraintSet.PARENT_ID, ConstraintSet.START, 24)
 
 
-            connect(saveBtn.id, ConstraintSet.END, ConstraintSet.PARENT_ID, ConstraintSet.END, 16)
+            connect(saveBtn.id, ConstraintSet.END, ConstraintSet.PARENT_ID, ConstraintSet.END, 24)
 
 
-            connect(toggleFilterBtn.id, ConstraintSet.END, saveBtn.id, ConstraintSet.START, 16)
+            connect(toggleFilterBtn.id, ConstraintSet.END, saveBtn.id, ConstraintSet.START, 24)
 
 
             applyTo(topTabBar)
@@ -271,7 +406,7 @@ class MainLayout(
             clone(mainFrame)
 
             connect(imageViewFrame.id, ConstraintSet.TOP, topTabBar.id, ConstraintSet.BOTTOM, 8)
-            connect(imageViewFrame.id, ConstraintSet.BOTTOM, categoryBar.id, ConstraintSet.TOP, 24)
+            connect(imageViewFrame.id, ConstraintSet.BOTTOM, bottomBar.id, ConstraintSet.TOP, 24)
             connect(imageViewFrame.id, ConstraintSet.START, ConstraintSet.PARENT_ID, ConstraintSet.START,8)
             connect(imageViewFrame.id, ConstraintSet.END, ConstraintSet.PARENT_ID, ConstraintSet.END,8)
 
@@ -279,31 +414,55 @@ class MainLayout(
             applyTo(mainFrame)
         }
 
+//        ConstraintSet().apply {
+//            clone(mainFrame)
+//
+//            connect(categoryBar.id, ConstraintSet.BOTTOM, editBar.id, ConstraintSet.TOP, 0)
+//            connect(categoryBar.id, ConstraintSet.START, ConstraintSet.PARENT_ID, ConstraintSet.START,0)
+//            connect(categoryBar.id, ConstraintSet.END, ConstraintSet.PARENT_ID, ConstraintSet.END,0)
+//
+//
+//            applyTo(mainFrame)
+//        }
+//
+//        ConstraintSet().apply {
+//            clone(mainFrame)
+//
+//            connect(editBar.id, ConstraintSet.BOTTOM, ConstraintSet.PARENT_ID, ConstraintSet.BOTTOM, 104)
+//            connect(editBar.id, ConstraintSet.START, ConstraintSet.PARENT_ID, ConstraintSet.START,8)
+//            connect(editBar.id, ConstraintSet.END, ConstraintSet.PARENT_ID, ConstraintSet.END, 8)
+//
+//
+//            applyTo(mainFrame)
+//        }
+
+        ConstraintSet().apply {
+            clone(bottomBar)
+
+            // categoryBar를 bottomBar의 상단에 위치시키고 상단 마진 설정
+            connect(categoryBar.id, ConstraintSet.TOP, ConstraintSet.PARENT_ID, ConstraintSet.TOP, 8) // 여기서 dpToPx는 dp 단위를 픽셀로 변환하는 함수입니다.
+
+            // editBar를 bottomBar의 하단에 위치시키고 하단 마진 설정
+            connect(editBar.id, ConstraintSet.TOP, categoryBar.id, ConstraintSet.BOTTOM, 8)
+
+            // 추가적으로 categoryBar와 editBar 사이의 제약 조건을 설정할 수 있습니다.
+            connect(editBar.id, ConstraintSet.BOTTOM, ConstraintSet.PARENT_ID, ConstraintSet.BOTTOM, 40)
+
+            applyTo(bottomBar)
+
+        }
+
+
         ConstraintSet().apply {
             clone(mainFrame)
 
-            connect(categoryBar.id, ConstraintSet.BOTTOM, editBar.id, ConstraintSet.TOP, 0)
-            connect(categoryBar.id, ConstraintSet.START, ConstraintSet.PARENT_ID, ConstraintSet.START,0)
-            connect(categoryBar.id, ConstraintSet.END, ConstraintSet.PARENT_ID, ConstraintSet.END,0)
+            connect(bottomBar.id, ConstraintSet.BOTTOM, ConstraintSet.PARENT_ID, ConstraintSet.BOTTOM, 128)
+            connect(bottomBar.id, ConstraintSet.START, ConstraintSet.PARENT_ID, ConstraintSet.START,8)
+            connect(bottomBar.id, ConstraintSet.END, ConstraintSet.PARENT_ID, ConstraintSet.END,8)
 
 
             applyTo(mainFrame)
         }
-
-        ConstraintSet().apply {
-            clone(mainFrame)
-
-            connect(editBar.id, ConstraintSet.BOTTOM, ConstraintSet.PARENT_ID, ConstraintSet.BOTTOM, 104)
-            connect(editBar.id, ConstraintSet.START, ConstraintSet.PARENT_ID, ConstraintSet.START,8)
-            connect(editBar.id, ConstraintSet.END, ConstraintSet.PARENT_ID, ConstraintSet.END, 8)
-
-
-            applyTo(mainFrame)
-        }
-
-
-
-
 
 
         galleryBtn.setOnClickListener {
@@ -427,7 +586,7 @@ class MainLayout(
                     // 사용자가 버튼을 꾹 누르고 있을 때의 동작
                     // 원본 이미지 표시
                     Log.i("test44","?@")
-                    Toast.makeText(context,"tapped",Toast.LENGTH_SHORT).show()
+//                    Toast.makeText(context,"tapped",Toast.LENGTH_SHORT).show()
                     imageViewManager.toggleImage(true)
 
                     true // 이벤트 처리 완료
@@ -435,7 +594,7 @@ class MainLayout(
                 MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
                     // 사용자가 버튼에서 손을 떼거나 취소했을 때의 동작
                     // 필터 적용된 이미지 표시
-                    Toast.makeText(context,"no tapped",Toast.LENGTH_SHORT).show()
+//                    Toast.makeText(context,"no tapped",Toast.LENGTH_SHORT).show()
                     imageViewManager.toggleImage(false)
 
                     true // 이벤트 처리 완료

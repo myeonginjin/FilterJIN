@@ -3,28 +3,12 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="100dp"
+    android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:layout_marginRight="20dp"
-    android:background="@color/black"
     tools:context=".MainActivity">
 
-    <TextView
-        android:id="@+id/tv_time"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textColor="@color/white"
-        android:layout_gravity="center"
-        android:text="name" />
-
-    <TextView
-        android:id="@+id/tv_title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textColor="@color/white"
-        android:layout_gravity="center"
-        android:text="category" />
 
     <ImageView
         android:id="@+id/userImg"
@@ -36,11 +20,12 @@
 
 
     <TextView
-        android:id="@+id/tv_name"
+        android:id="@+id/filter_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textColor="@color/white"
         android:layout_gravity="center"
+        android:textSize="10dp"
         android:text="LUT_Data" />
 
 
