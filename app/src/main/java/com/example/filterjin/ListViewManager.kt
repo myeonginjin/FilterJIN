@@ -4,12 +4,18 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.util.Log
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.view.marginBottom
 import androidx.core.view.marginTop
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class ListViewManager (private val context : Context,  private val mainLayout: MainLayout , private val imageViewManager : ImageViewManager) {
     private  val editBar = RecyclerView(context)
@@ -68,42 +74,68 @@ class ListViewManager (private val context : Context,  private val mainLayout: M
                 val item = itemList[position]
 //                Toast.makeText(context, "${item.name} 클릭함", Toast.LENGTH_SHORT).show()
 
+                // 메소드 실행 전 시간 측정
+                val startTime = System.nanoTime()
+
+                // 메소드 실행
                 imageViewManager.applyFilter(item)
+
+                // 메소드 실행 후 시간 측정
+                val endTime = System.nanoTime()
+
+                // 실행 시간 계산 (나노초 단위)
+                val duration = (endTime - startTime) / 1_000_000_000.0 // 초 단위로 변환
+
+                // 로그로 실행 시간 출력
+                Log.i("Performance", "${item.name} 필터 적용 시간: $duration ms")
             }
         }
         return  editBar
     }
 
     @SuppressLint("NotifyDataSetChanged")
-    fun setCurrentItemImage (bitmap: Bitmap) {
-        itemList.forEach { item ->
+    fun setCurrentItemImage(bitmap: Bitmap) {
+        CoroutineScope(Dispatchers.IO).launch {
 
+            delay(500)
 
-            if (item.type == "Ratio") {
-                item.updateThumbnail(ImageProcessor.applyRatioFilter(bitmap, item.rRatio, item.gRatio , item.bRatio))
+            itemList.forEach { item ->
+                // 각 아이템을 1초간 로딩 상태로 설정
+                item.isLoading = true
+                withContext(Dispatchers.Main) {
+                    // UI 업데이트를 위해 어댑터에 변경 알림
+                    filterAdapter.notifyItemChanged(itemList.indexOf(item))
+                }
+
+                // 1초 대기
+
+                // 실제 이미지 처리
+                val processedImage = when (item.type) {
+                    "Ratio" -> ImageProcessor.applyRatioFilter(bitmap, item.rRatio, item.gRatio, item.bRatio)
+                    "LUT" -> {
+                        val assetManager = context.resources.assets
+                        val fileName: String = item.lut
+                        val inputStreamLUT = assetManager.open(fileName)
+                        val lutBitmap = BitmapFactory.decodeStream(inputStreamLUT)
+                        ImageProcessor.applyLutToBitmap(bitmap, lutBitmap)
+                    }
+                    else -> bitmap
+                }
+
+                // 이미지 처리 완료 및 로딩 상태 해제
+                item.updateThumbnail(processedImage)
+                item.isLoading = false
+
+                withContext(Dispatchers.Main) {
+                    // UI 업데이트를 위해 어댑터에 변경 알림
+                    filterAdapter.notifyItemChanged(itemList.indexOf(item))
+                }
             }
 
-            else if(item.type == "LUT") {
-                lateinit var lutBitmap: Bitmap
-                val assetManager = context.resources.assets
-                val fileName : String = item.lut
-
-
-                val inputStreamLUT = assetManager.open(fileName)
-                lutBitmap = BitmapFactory.decodeStream(inputStreamLUT)
-
-
-
-                item.updateThumbnail(ImageProcessor.applyLutToBitmap(bitmap , lutBitmap))
-            }
-
-            else {
-                item.updateThumbnail(bitmap)
+            // 모든 이미지 처리가 완료되면 UI 업데이트
+            withContext(Dispatchers.Main) {
+                filterAdapter.notifyDataSetChanged()
             }
         }
-
-
-        //어뎁터와 리싸이클러 뷰 갱신
-        filterAdapter.notifyDataSetChanged()
     }
 }
