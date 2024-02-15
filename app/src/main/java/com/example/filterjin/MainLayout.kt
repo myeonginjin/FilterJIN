@@ -15,6 +15,7 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.graphics.Typeface
+import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.GradientDrawable
 import android.net.Uri
 import android.os.Build
@@ -26,8 +27,10 @@ import android.service.controls.templates.ThumbnailTemplate
 import android.util.Log
 import android.view.Gravity
 import android.view.MotionEvent
+import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.FrameLayout
 import android.widget.HorizontalScrollView
 import android.widget.ImageView
 import android.widget.LinearLayout
@@ -90,7 +93,6 @@ class MainLayout(
 
 
 
-
     //사용자 기기 갤러리 통해서 받아온 이미지 이미지뷰어에 띄우기
     fun setImage(originBitmap: Bitmap, resizedBitmap : Bitmap, thumbnailBitmap: Bitmap) {
 
@@ -110,8 +112,28 @@ class MainLayout(
     init {
         createProgressDialog()
         setupGalleryButtonWithTooltip()
+
     }
 
+    fun showCenteredProgressDialog() {
+        // Create a new Dialog instance
+        val progressDialog = Dialog(context).apply {
+            // Set the custom layout
+            setContentView(R.layout.custom_load_image_progress_dialog)
+            // Make the dialog background transparent
+            window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+            // Disable the option to cancel the dialog by touching outside
+            setCancelable(false)
+        }
+
+        // Show the dialog
+        progressDialog.show()
+
+        // Optionally, you can set a delay to automatically dismiss the dialog after some time
+        Handler(Looper.getMainLooper()).postDelayed({
+            progressDialog.dismiss()
+        }, 1000) // Dismiss after 5 seconds for demonstration
+    }
 
     private fun setupGalleryButtonWithTooltip() {
         // SharedPreferences를 사용하여 최초 클릭 여부 확인

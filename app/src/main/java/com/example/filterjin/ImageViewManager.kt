@@ -15,7 +15,7 @@ class ImageViewManager (private val context : Context){
     var resizedImage : Bitmap = defaultImage
     var currentViewImage : Bitmap = defaultImage
     var currentFilterType: String? = null
-    var currentFilterName: String? = null
+    private var currentFilterName: String? = null
     var currentLUTName: String? = null
     var currentFilterR: Double = 0.0
     var currentFilterG: Double = 0.0
@@ -52,6 +52,7 @@ class ImageViewManager (private val context : Context){
     fun loadGalleryImage(bitmap: Bitmap){
         resizedImage = bitmap
         currentViewImage = bitmap
+        currentFilterName = null
         imageView.setImageBitmap(bitmap)
     }
 

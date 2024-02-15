@@ -1,0 +1,52 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:padding="20dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/custom_dialog_background">
+
+        <ProgressBar
+            android:id="@+id/progressBar"
+            style="?android:attr/progressBarStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="20dp"/>
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:text="이미지 로드 중..."
+                android:textColor="#000000"
+                android:layout_marginTop="5dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                android:text="잠시만 기다려주세요!"
+                android:textColor="#757575"
+                android:textSize="12sp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                />
+        </LinearLayout>
+    </LinearLayout>
+
+    <!--    &lt;!&ndash; X 버튼 추가 &ndash;&gt;-->
+    <!--    <ImageButton-->
+    <!--        android:id="@+id/closeButton"-->
+    <!--        android:src="@drawable/outline_cancel_24"-->
+    <!--        android:layout_width="11dp"-->
+    <!--        android:layout_height="11dp"-->
+    <!--        android:layout_gravity="end|top"-->
+    <!--        android:layout_margin="10dp"-->
+    <!--        android:background="?android:selectableItemBackgroundBorderless"-->
+    <!--        android:contentDescription="@string/close_button_description"/>-->
+
+</FrameLayout>
