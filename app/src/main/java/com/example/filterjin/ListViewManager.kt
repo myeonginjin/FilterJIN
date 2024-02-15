@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -94,32 +95,45 @@ class ListViewManager (private val context : Context,  private val mainLayout: M
 
     @SuppressLint("NotifyDataSetChanged")
     fun setCurrentItemImage(bitmap: Bitmap) {
-        // Coroutine 시작
         CoroutineScope(Dispatchers.IO).launch {
+
+            delay(500)
+
             itemList.forEach { item ->
-                when (item.type) {
-                    "Ratio" -> {
-                        item.updateThumbnail(ImageProcessor.applyRatioFilter(bitmap, item.rRatio, item.gRatio, item.bRatio))
-                    }
+                // 각 아이템을 1초간 로딩 상태로 설정
+                item.isLoading = true
+                withContext(Dispatchers.Main) {
+                    // UI 업데이트를 위해 어댑터에 변경 알림
+                    filterAdapter.notifyItemChanged(itemList.indexOf(item))
+                }
+
+                // 1초 대기
+
+                // 실제 이미지 처리
+                val processedImage = when (item.type) {
+                    "Ratio" -> ImageProcessor.applyRatioFilter(bitmap, item.rRatio, item.gRatio, item.bRatio)
                     "LUT" -> {
-                        lateinit var lutBitmap: Bitmap
                         val assetManager = context.resources.assets
                         val fileName: String = item.lut
-
                         val inputStreamLUT = assetManager.open(fileName)
-                        lutBitmap = BitmapFactory.decodeStream(inputStreamLUT)
+                        val lutBitmap = BitmapFactory.decodeStream(inputStreamLUT)
+                        ImageProcessor.applyLutToBitmap(bitmap, lutBitmap)
+                    }
+                    else -> bitmap
+                }
 
-                        item.updateThumbnail(ImageProcessor.applyLutToBitmap(bitmap, lutBitmap))
-                    }
-                    else -> {
-                        item.updateThumbnail(bitmap)
-                    }
+                // 이미지 처리 완료 및 로딩 상태 해제
+                item.updateThumbnail(processedImage)
+                item.isLoading = false
+
+                withContext(Dispatchers.Main) {
+                    // UI 업데이트를 위해 어댑터에 변경 알림
+                    filterAdapter.notifyItemChanged(itemList.indexOf(item))
                 }
             }
 
-            // 메인 스레드로 전환하여 UI 업데이트
+            // 모든 이미지 처리가 완료되면 UI 업데이트
             withContext(Dispatchers.Main) {
-                // 어댑터와 리사이클러뷰 갱신
                 filterAdapter.notifyDataSetChanged()
             }
         }
