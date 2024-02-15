@@ -81,13 +81,13 @@ class ImageViewManager (private val context : Context){
         Log.i("test","$currentFilterName     ${item.name}")
 
         if (currentFilterName.equals(item.name)){
-            setImageView(resizedImage)
-            currentFilterType = null
-            currentFilterName = null
-            currentLUTName = null
-            currentFilterR = 0.0
-            currentFilterG = 0.0
-            currentFilterB = 0.0
+//            setImageView(resizedImage)
+//            currentFilterType = null
+//            currentFilterName = null
+//            currentLUTName = null
+//            currentFilterR = 0.0
+//            currentFilterG = 0.0
+//            currentFilterB = 0.0
         }
 
         else{

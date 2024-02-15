@@ -5,7 +5,10 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.util.Log
+import android.view.Gravity
+import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.TextView
 import android.widget.Toast
 import androidx.core.view.marginBottom
 import androidx.core.view.marginTop
@@ -71,14 +74,48 @@ class ListViewManager (private val context : Context,  private val mainLayout: M
 
             //콜백함수 오바라이딩
             override fun onItemClick(position: Int) {
-                val item = itemList[position]
+
+                val selectedItem = itemList[position]
+
+                // LayoutInflater를 사용하여 custom_toast_layout 레이아웃을 로드
+                val inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+                val layout = inflater.inflate(R.layout.custom_toast_layout, null)
+
+                // 레이아웃 내의 TextView 찾기
+                val text: TextView = layout.findViewById(R.id.toast_text)
+                val category: TextView = layout.findViewById(R.id.toast_category)
+
+                // TextView에 텍스트 설정
+                text.text = selectedItem.name
+                category.text = selectedItem.category
+
+                // Toast 객체 생성 및 설정
+                val toast = Toast(context).apply {
+                    setGravity(Gravity.CENTER, 0, 0) // 화면 중앙에 위치
+                    duration = Toast.LENGTH_SHORT
+                    view = layout
+                }
+                toast.show()
+
+
+                // Toast 표시
+                toast.show()
+
+                // 이전에 선택된 아이템 선택 해제
+                itemList.forEach { it.isSelected = false }
+                // 현재 아이템 선택 상태 반전
+                selectedItem.isSelected = !selectedItem.isSelected
+
+                // 어댑터 갱신
+                filterAdapter.notifyDataSetChanged()
+
 //                Toast.makeText(context, "${item.name} 클릭함", Toast.LENGTH_SHORT).show()
 
                 // 메소드 실행 전 시간 측정
                 val startTime = System.nanoTime()
 
                 // 메소드 실행
-                imageViewManager.applyFilter(item)
+                imageViewManager.applyFilter(selectedItem)
 
                 // 메소드 실행 후 시간 측정
                 val endTime = System.nanoTime()
@@ -87,7 +124,9 @@ class ListViewManager (private val context : Context,  private val mainLayout: M
                 val duration = (endTime - startTime) / 1_000_000_000.0 // 초 단위로 변환
 
                 // 로그로 실행 시간 출력
-                Log.i("Performance", "${item.name} 필터 적용 시간: $duration ms")
+                Log.i("Performance", "${selectedItem.name} 필터 적용 시간: $duration ms")
+
+
             }
         }
         return  editBar
@@ -123,7 +162,7 @@ class ListViewManager (private val context : Context,  private val mainLayout: M
             // 메인 스레드로 전환하여 UI 업데이트
             withContext(Dispatchers.Main) {
                 // 어댑터와 리사이클러뷰 갱신
-
+                filterAdapter.resetFilterSelection()
                 filterAdapter.notifyDataSetChanged()
 //                mainLayout.showCenteredProgressDialog()
             }
