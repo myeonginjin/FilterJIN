@@ -10,7 +10,14 @@ import androidx.constraintlayout.widget.ConstraintLayout
 class ImageViewManager (private val context : Context){
 
     private var imageView : ImageView = ImageView(context)
-    private var defaultImage : Bitmap = BitmapFactory.decodeResource(context.resources, R.drawable.default_image)
+
+
+    val assetManager = context.resources.assets
+    private val inputStream = assetManager.open("defaultMainImage.png")
+    private var defaultImage : Bitmap = BitmapFactory.decodeStream(inputStream)
+
+
+
     var originImage : Bitmap = defaultImage
     var resizedImage : Bitmap = defaultImage
     var currentViewImage : Bitmap = defaultImage

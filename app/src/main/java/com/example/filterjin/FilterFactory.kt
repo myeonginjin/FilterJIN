@@ -52,8 +52,14 @@ class FilterFactory (private val context: Context) {
             }
 
 
-            //            if (type == "Ratio"){
-//                thumbnail = ImageProcessor.applyRatioFilter(defaultImage, rRatio, gRatio, bRatio)
+
+            val assetManager = context.resources.assets
+            val inputStream = assetManager.open("defaultItemThumnailImage.png")
+
+            var thumbnail : Bitmap = BitmapFactory.decodeStream(inputStream)
+
+//            if (type == "Ratio"){
+//                thumbnail = ImageProcessor.applyRatioFilter(thumbnail, rRatio, gRatio, bRatio)
 //            }
 //            else if(type == "LUT") {
 //                lateinit var lutBitmap: Bitmap
@@ -63,18 +69,14 @@ class FilterFactory (private val context: Context) {
 //                try{
 //                    val inputStreamLUT = assetManager.open(fileName)
 //                    lutBitmap = BitmapFactory.decodeStream(inputStreamLUT)
-//                    val applyLutBitmap = ImageProcessor.applyLutToBitmap(defaultImage , lutBitmap)
+//                    val applyLutBitmap = ImageProcessor.applyLutToBitmap(thumbnail , lutBitmap)
 //                    thumbnail = applyLutBitmap
 //
 //                }catch (e : Exception){
-//                    thumbnail = defaultImage
+//                    thumbnail = thumbnail
 //                    e.printStackTrace()
 //                }
 //            }
-
-
-            var thumbnail : Bitmap = BitmapFactory.decodeResource(context.resources, R.drawable.default_image)
-
 
 
             try {
