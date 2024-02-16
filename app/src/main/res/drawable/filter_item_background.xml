@@ -2,7 +2,7 @@
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:state_selected="true">
         <shape>
-            <solid android:color="#AA8855EE"/> <!-- 투명 보라색 -->
+            <solid android:color="#AA787878"/> <!-- 투명 회색 -->
         </shape>
     </item>
     <item>
