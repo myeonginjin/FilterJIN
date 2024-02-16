@@ -471,6 +471,7 @@ class MainLayout(
             // 추가적으로 categoryBar와 editBar 사이의 제약 조건을 설정할 수 있습니다.
             connect(editBar.id, ConstraintSet.BOTTOM, ConstraintSet.PARENT_ID, ConstraintSet.BOTTOM, 40)
 
+
             applyTo(bottomBar)
 
         }

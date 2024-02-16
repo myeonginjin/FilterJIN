@@ -27,7 +27,7 @@ class ListViewManager (private val context : Context,  private val mainLayout: M
 
     private val filterFactory = FilterFactory(context)
 
-    //리싸이클러뷰의 item으로 사용할 data class 데이터타입의 Filter 인스턴스 리스트 받아오기
+    //리싸이클러뷰의  item으로 사용할 data class 데이터타입의 Filter 인스턴스 리스트 받아오기
     private val itemList =  filterFactory.getFilterItemList()
 
     //어뎁터에 인스턴스 리스트 보내, 뷰 요소로 사용할 수 있도록 만들기
@@ -67,6 +67,7 @@ class ListViewManager (private val context : Context,  private val mainLayout: M
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT
             )
+//            setPadding(40,0,0,40)
         }
 
 
