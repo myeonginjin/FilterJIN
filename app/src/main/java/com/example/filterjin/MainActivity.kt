@@ -13,6 +13,7 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 
 class MainActivity : AppCompatActivity() {
 
@@ -21,7 +22,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
+        installSplashScreen()
 
         fun resizeBitmapMaintainingAspectRatio(originalBitmap: Bitmap, maxSize: Int): Bitmap {
             val width = originalBitmap.width

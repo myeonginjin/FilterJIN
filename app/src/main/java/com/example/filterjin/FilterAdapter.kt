@@ -13,46 +13,52 @@ class FilterAdapter(var filterItemList: List<FilterItem>):
     RecyclerView.Adapter<FilterAdapter.FilterViewHolder>() {
 
     interface OnItemClickListener {
-        fun onItemClick(position: Int) {}
+        fun onItemClick(position: Int)
     }
+
     var itemClickListener: OnItemClickListener? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FilterViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.filter_item_recycler_view, parent, false)
         return FilterViewHolder(view)
     }
+
     override fun onBindViewHolder(holder: FilterViewHolder, position: Int) {
-        holder.itemImg.setImageBitmap(filterItemList[position].thumbnail)
-        holder.filterName.text = filterItemList[position].name
+        val filterItem = filterItemList[position]
+
+        holder.itemImg.setImageBitmap(filterItem.thumbnail)
+        holder.filterName.text = filterItem.name
+
+        // 선택 상태에 따른 배경색 변경
+        holder.itemView.isSelected = filterItem.isSelected
+
+        holder.itemView.setOnClickListener {
+            val previousIndex = filterItemList.indexOfFirst { it.isSelected }
+            if (previousIndex != -1 && previousIndex != position) {
+                filterItemList[previousIndex].isSelected = false
+                notifyItemChanged(previousIndex)
+            }
+
+            // 현재 아이템의 선택 상태 반전
+            filterItem.isSelected = !filterItem.isSelected
+            notifyItemChanged(position)
+
+            // 콜백 호출
+            itemClickListener?.onItemClick(position)
+        }
+    }
+
+    fun resetFilterSelection() {
+        filterItemList.forEach { it.isSelected = false }
+        notifyDataSetChanged()
     }
 
     override fun getItemCount(): Int {
         return filterItemList.count()
     }
 
-
-
-
     inner class FilterViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val itemImg = itemView.findViewById<ImageView>(R.id.userImg)
-        val filterName = itemView.findViewById<TextView>(R.id.filter_name)
-
-        init {
-
-            itemView.setOnClickListener {
-
-                //인터페이스인 리스너의 콜백 함수 onItemClick(추상함수) 구현
-                itemClickListener?.onItemClick(adapterPosition)
-
-
-            }
-
-
-        }
-
+        val itemImg: ImageView = itemView.findViewById(R.id.userImg)
+        val filterName: TextView = itemView.findViewById(R.id.filter_name)
     }
-
-
 }
-
-

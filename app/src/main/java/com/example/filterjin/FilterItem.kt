@@ -14,7 +14,7 @@ data class FilterItem(
     val category: String,
     val type: String,
     val lut: String,
-    var isLoading: Boolean = false // 로딩 상태 추가
+    var isSelected: Boolean = false // 선택 상태 추가
 ) {
     fun updateThumbnail(newImage: Bitmap) {
         thumbnail = newImage

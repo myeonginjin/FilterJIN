@@ -5,6 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
+    android:background="@drawable/filter_item_background"
     android:orientation="vertical"
     android:layout_marginRight="20dp"
     tools:context=".MainActivity">
@@ -16,6 +17,9 @@
         android:layout_height="50dp"
         android:layout_gravity="center"
         android:scaleType="centerCrop"
+        android:layout_marginTop="3dp"
+        android:layout_marginLeft="3dp"
+        android:layout_marginRight="3dp"
         android:src="@drawable/ic_launcher_background">
     </ImageView>
 
@@ -27,6 +31,7 @@
         android:textColor="@color/white"
         android:layout_gravity="center"
         android:layout_marginTop="4dp"
+        android:layout_marginBottom="1dp"
         android:textSize="8dp"
         android:text="LUT_Data" />
 
