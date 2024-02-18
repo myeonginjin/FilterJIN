@@ -86,6 +86,7 @@ class ListViewManager (private val context : Context,  private val mainLayout: M
 
                 val selectedItem = itemList[position]
 
+                /*
                 toastRunnable?.let { toastHandler.removeCallbacks(it) }
 
 
@@ -112,7 +113,9 @@ class ListViewManager (private val context : Context,  private val mainLayout: M
                 toastRunnable = Runnable { toast?.cancel() }
                 // 예: 500ms 후에 토스트 메시지 사라지게 설정
                 toastHandler.postDelayed(toastRunnable!!, 800)
+                */
 
+                mainLayout.showCustomMessage(selectedItem.name , selectedItem.category)
 
 
                 // 이전에 선택된 아이템 선택 해제
