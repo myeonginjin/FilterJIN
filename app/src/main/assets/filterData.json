@@ -1,0 +1,102 @@
+[
+  {
+    "id" : 1,
+    "name" : "Sepia",
+    "category" : "PREMIUM",
+    "type" : "LUT",
+    "rRatio" : 0.0,
+    "gRatio" : 0.0,
+    "bRatio" : 0.0,
+    "LUT" : "sepia.png"
+  },
+  {
+    "id" : 2,
+    "name" : "SnowStorm",
+    "category" : "PREMIUM",
+    "type" : "LUT",
+    "rRatio" : 0.0,
+    "gRatio" : 0.0,
+    "bRatio" : 0.0,
+    "LUT" : "snowStorm.png"
+  },
+  {
+    "id" : 3,
+    "name" : "Amatorka",
+    "category" : "PREMIUM",
+    "type" : "LUT",
+    "rRatio" : 0.0,
+    "gRatio" : 0.0,
+    "bRatio" : 0.0,
+    "LUT" : "amatorka.png"
+  },
+  {
+    "id" : 4,
+    "name" : "Red Splash",
+    "category" : "ART",
+    "type" : "LUT",
+    "rRatio" : 0.0,
+    "gRatio" : 0.0,
+    "bRatio" : 0.0,
+    "LUT" : "redS.jpg"
+  },
+  {
+    "id" : 5,
+    "name" : "Green Splash",
+    "category" : "ART",
+    "type" : "LUT",
+    "rRatio" : 0.0,
+    "gRatio" : 0.0,
+    "bRatio" : 0.0,
+    "LUT" : "greenS.jpg"
+  },
+  {
+    "id" : 6,
+    "name" : "Blue Splash",
+    "category" : "ART",
+    "type" : "LUT",
+    "rRatio" : 0.0,
+    "gRatio" : 0.0,
+    "bRatio" : 0.0,
+    "LUT" : "blueS.jpg"
+  },
+  {
+    "id" : 7,
+    "name" : "BW200",
+    "category" : "MONOTONE",
+    "type" : "LUT",
+    "rRatio" : 0.0,
+    "gRatio" : 0.0,
+    "bRatio" : 0.0,
+    "LUT" : "grayScale.jpeg"
+  },
+  {
+    "id" : 8,
+    "name" : "BW400",
+    "category" : "MONOTONE",
+    "type" : "Ratio",
+    "rRatio" : 0.2126,
+    "gRatio" : 0.7152,
+    "bRatio" : 0.0722,
+    "LUT" : ""
+  },
+  {
+    "id" : 9,
+    "name" : "BW800",
+    "category" : "MONOTONE",
+    "type" : "Ratio",
+    "rRatio" : 0.7152,
+    "gRatio" : 0.2126,
+    "bRatio" : 0.0722,
+    "LUT" : ""
+  },
+  {
+    "id" : 10,
+    "name" : "fujiFilm",
+    "category" : "FILM",
+    "type" : "LUT",
+    "rRatio" : 0.0,
+    "gRatio" : 0.0,
+    "bRatio" : 0.0,
+    "LUT" : "fujiFilm.png"
+  }
+]

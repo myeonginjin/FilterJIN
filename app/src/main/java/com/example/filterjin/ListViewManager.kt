@@ -1,0 +1,188 @@
+package com.example.filterjin
+
+import android.annotation.SuppressLint
+import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.os.Handler
+import android.os.Looper
+import android.util.Log
+import android.view.Gravity
+import android.view.LayoutInflater
+import android.view.ViewGroup
+import android.widget.TextView
+import android.widget.Toast
+import androidx.core.view.marginBottom
+import androidx.core.view.marginTop
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+
+class ListViewManager (private val context : Context,  private val mainLayout: MainLayout , private val imageViewManager : ImageViewManager) {
+    private  val editBar = RecyclerView(context)
+
+    private val filterFactory = FilterFactory(context)
+
+    //리싸이클러뷰의  item으로 사용할 data class 데이터타입의 Filter 인스턴스 리스트 받아오기
+    private val itemList =  filterFactory.getFilterItemList()
+
+    //어뎁터에 인스턴스 리스트 보내, 뷰 요소로 사용할 수 있도록 만들기
+    private val filterAdapter = FilterAdapter(itemList)
+
+    private var toastHandler = Handler(Looper.getMainLooper())
+    private var toastRunnable: Runnable? = null
+    private var toast: Toast? = null
+
+    fun getUniqueCategories(): List<String> {
+        return filterFactory.getFilterCategoryList().map { it.category }.distinct()
+    }
+
+
+
+
+    fun scrollToCategory(category: String) {
+        if (category == "ALL") {
+            // ALL 카테고리 선택 시, 리스트의 가장 처음으로 스크롤
+            (editBar.layoutManager as? LinearLayoutManager)?.scrollToPositionWithOffset(0, 0)
+        } else {
+            // 다른 카테고리 선택 시, 해당 카테고리의 첫 번째 아이템으로 스크롤
+            val position = itemList.indexOfFirst { it.category == category }
+            if (position != -1) {
+                (editBar.layoutManager as? LinearLayoutManager)?.scrollToPositionWithOffset(position, 0)
+            }
+        }
+    }
+
+
+
+    @SuppressLint("NotifyDataSetChanged")
+    fun getEditBar() : RecyclerView{
+
+        editBar.apply {
+            layoutParams = ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            )
+//            setPadding(40,0,0,40)
+        }
+
+
+        //어뎁터와 리싸이클러 뷰 갱신
+        filterAdapter.notifyDataSetChanged()
+
+        editBar.adapter = filterAdapter
+
+        //리스트가 좌우로 스크롤되도록 지정
+        editBar.layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
+
+        filterAdapter.itemClickListener = object : FilterAdapter.OnItemClickListener {
+
+            //콜백함수 오바라이딩
+            override fun onItemClick(position: Int) {
+
+                val selectedItem = itemList[position]
+
+                /*
+                toastRunnable?.let { toastHandler.removeCallbacks(it) }
+
+
+                // LayoutInflater를 사용하여 custom_toast_layout 레이아웃을 로드
+                val inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+                val layout = inflater.inflate(R.layout.custom_toast_layout, null)
+
+                // 레이아웃 내의 TextView 찾기 및 설정
+                val text: TextView = layout.findViewById(R.id.toast_text)
+                val category: TextView = layout.findViewById(R.id.toast_category)
+                text.text = selectedItem.name
+                category.text = selectedItem.category
+
+                // 토스트 설정 및 표시
+                toast?.cancel() // 이전 토스트 취소
+                toast = Toast(context).apply {
+                    setGravity(Gravity.CENTER, 0, 0)
+                    duration = Toast.LENGTH_SHORT
+                    view = layout
+                }
+                toast?.show()
+
+                // Runnable을 통해 지정한 시간 후에 Toast 취소
+                toastRunnable = Runnable { toast?.cancel() }
+                // 예: 500ms 후에 토스트 메시지 사라지게 설정
+                toastHandler.postDelayed(toastRunnable!!, 800)
+                */
+
+                mainLayout.showCustomMessage(selectedItem.name , selectedItem.category)
+
+
+                // 이전에 선택된 아이템 선택 해제
+                itemList.forEach { it.isSelected = false }
+                // 현재 아이템 선택 상태 반전
+                selectedItem.isSelected = !selectedItem.isSelected
+
+                // 어댑터 갱신
+                filterAdapter.notifyDataSetChanged()
+
+//                Toast.makeText(context, "${item.name} 클릭함", Toast.LENGTH_SHORT).show()
+
+                // 메소드 실행 전 시간 측정
+                val startTime = System.nanoTime()
+
+                // 메소드 실행
+                imageViewManager.applyFilter(selectedItem)
+
+                // 메소드 실행 후 시간 측정
+                val endTime = System.nanoTime()
+
+                // 실행 시간 계산 (나노초 단위)
+                val duration = (endTime - startTime) / 1_000_000_000.0 // 초 단위로 변환
+
+                // 로그로 실행 시간 출력
+                Log.i("Performance", "${selectedItem.name} 필터 적용 시간: $duration ms")
+
+
+            }
+        }
+        return  editBar
+    }
+    // Coroutines를 사용하여 비동기 처리
+    fun setCurrentItemImage(bitmap: Bitmap) {
+        // Coroutine 시작
+
+
+        CoroutineScope(Dispatchers.IO).launch {
+            itemList.forEach { item ->
+                when (item.type) {
+                    "Ratio" -> {
+                        item.updateThumbnail(ImageProcessor.applyRatioFilter(bitmap, item.rRatio, item.gRatio, item.bRatio))
+                    }
+                    "LUT" -> {
+                        lateinit var lutBitmap: Bitmap
+                        val assetManager = context.resources.assets
+                        val fileName: String = item.lut
+
+                        val inputStreamLUT = assetManager.open(fileName)
+                        lutBitmap = BitmapFactory.decodeStream(inputStreamLUT)
+
+                        item.updateThumbnail(ImageProcessor.applyLutToBitmap(bitmap, lutBitmap))
+                    }
+                    else -> {
+                        item.updateThumbnail(bitmap)
+                    }
+                }
+            }
+
+
+            // 메인 스레드로 전환하여 UI 업데이트
+            withContext(Dispatchers.Main) {
+                // 어댑터와 리사이클러뷰 갱신
+                filterAdapter.resetFilterSelection()
+                filterAdapter.notifyDataSetChanged()
+//                mainLayout.showCenteredProgressDialog()
+            }
+        }
+    }
+}
