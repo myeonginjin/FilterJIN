@@ -26,6 +26,7 @@ import android.provider.MediaStore
 import android.service.controls.templates.ThumbnailTemplate
 import android.util.Log
 import android.view.Gravity
+import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
@@ -35,6 +36,7 @@ import android.widget.HorizontalScrollView
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.ProgressBar
+import android.widget.TextView
 import android.widget.Toast
 import android.widget.ToggleButton
 import androidx.activity.result.ActivityResultLauncher
@@ -92,6 +94,8 @@ class MainLayout(
     private var imageProcessingJob: Job? = null // 이미지 처리 작업을 관리할 Job 변수
 
 
+    private var currentMessageView: View? = null // 현재 표시된 메시지 뷰를 참조하기 위한 변수
+
 
     //사용자 기기 갤러리 통해서 받아온 이미지 이미지뷰어에 띄우기
     fun setImage(originBitmap: Bitmap, resizedBitmap : Bitmap, thumbnailBitmap: Bitmap) {
@@ -115,24 +119,40 @@ class MainLayout(
 
     }
 
-    fun showCenteredProgressDialog() {
-        // Create a new Dialog instance
-        val progressDialog = Dialog(context).apply {
-            // Set the custom layout
-            setContentView(R.layout.custom_load_image_progress_dialog)
-            // Make the dialog background transparent
-            window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-            // Disable the option to cancel the dialog by touching outside
-            setCancelable(false)
+    fun showCustomMessage(filterName: String , filterCategory : String) {
+        // 이전 메시지 뷰가 있다면 제거
+        currentMessageView?.let {
+            mainFrame.removeView(it)
+            currentMessageView = null
         }
 
-        // Show the dialog
-        progressDialog.show()
+        // 새 메시지 뷰 생성 및 추가
+        val inflater = LayoutInflater.from(context)
+        val messageView = inflater.inflate(R.layout.custom_toast_layout, mainFrame, false)
+        val text: TextView = messageView.findViewById(R.id.toast_text)
+        val category: TextView = messageView.findViewById(R.id.toast_category)
+        text.text = filterName // 필터 이름 설정
+        category.text = filterCategory
 
-        // Optionally, you can set a delay to automatically dismiss the dialog after some time
+        val params = ConstraintLayout.LayoutParams(
+            ConstraintLayout.LayoutParams.WRAP_CONTENT,
+            ConstraintLayout.LayoutParams.WRAP_CONTENT
+        ).apply {
+            topToTop = ConstraintSet.PARENT_ID
+            bottomToBottom = ConstraintSet.PARENT_ID
+            startToStart = ConstraintSet.PARENT_ID
+            endToEnd = ConstraintSet.PARENT_ID
+        }
+        mainFrame.addView(messageView, params)
+        currentMessageView = messageView // 현재 메시지 뷰 참조 업데이트
+
+        // 일정 시간 후 메시지 뷰 제거
         Handler(Looper.getMainLooper()).postDelayed({
-            progressDialog.dismiss()
-        }, 1000) // Dismiss after 5 seconds for demonstration
+            mainFrame.removeView(messageView)
+            if (currentMessageView == messageView) {
+                currentMessageView = null // 참조 제거
+            }
+        }, 1000) // 여기서는 1000ms 후에 메시지 뷰를 제거
     }
 
     private fun setupGalleryButtonWithTooltip() {
