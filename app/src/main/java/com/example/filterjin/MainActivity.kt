@@ -74,7 +74,7 @@ class MainActivity : AppCompatActivity() {
                             // 리사이징 작업 및 리사이징된 이미지의 회전 처리 (보간 작업 포함)
 
 
-                                // 장축을 680 픽셀로 고정하여 리사이징
+                                // 장축을 800 픽셀로 고정하여 리사이징
                                 val rotatedResizedBitmap = resizeBitmapMaintainingAspectRatio(rotatedOriginalBitmap, 800)
 //                                rotatedResizedBitmap = rotateImageIfRequired(this, resizedBitmap, imageUri)
 

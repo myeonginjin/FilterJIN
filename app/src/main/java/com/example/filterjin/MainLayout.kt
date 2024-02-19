@@ -97,6 +97,8 @@ class MainLayout(
     private var currentMessageView: View? = null // 현재 표시된 메시지 뷰를 참조하기 위한 변수
 
 
+
+
     //사용자 기기 갤러리 통해서 받아온 이미지 이미지뷰어에 띄우기
     fun setImage(originBitmap: Bitmap, resizedBitmap : Bitmap, thumbnailBitmap: Bitmap) {
 
@@ -120,6 +122,8 @@ class MainLayout(
     }
 
     fun showCustomMessage(filterName: String , filterCategory : String) {
+
+
         // 이전 메시지 뷰가 있다면 제거
         currentMessageView?.let {
             mainFrame.removeView(it)
@@ -134,15 +138,21 @@ class MainLayout(
         text.text = filterName // 필터 이름 설정
         category.text = filterCategory
 
+
+
         val params = ConstraintLayout.LayoutParams(
             ConstraintLayout.LayoutParams.WRAP_CONTENT,
             ConstraintLayout.LayoutParams.WRAP_CONTENT
         ).apply {
-            topToTop = ConstraintSet.PARENT_ID
-            bottomToBottom = ConstraintSet.PARENT_ID
-            startToStart = ConstraintSet.PARENT_ID
-            endToEnd = ConstraintSet.PARENT_ID
+            topToTop = imageViewFrame.id
+            bottomToBottom =  imageViewFrame.id
+            startToStart =  imageViewFrame.id
+            endToEnd =  imageViewFrame.id
+
         }
+
+
+
         mainFrame.addView(messageView, params)
         currentMessageView = messageView // 현재 메시지 뷰 참조 업데이트
 
