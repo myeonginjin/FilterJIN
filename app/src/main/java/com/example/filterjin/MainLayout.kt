@@ -1,21 +1,14 @@
 package com.example.filterjin
 
 import android.annotation.SuppressLint
-import android.app.Activity
-import android.app.AlertDialog
 import android.app.Dialog
-import android.app.ProgressDialog
 import android.content.ContentValues
 import android.content.Context
-import android.content.DialogInterface
 import android.content.Intent
-import android.content.pm.PackageManager
-import android.content.res.ColorStateList
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.graphics.Typeface
-import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.GradientDrawable
 import android.net.Uri
 import android.os.Build
@@ -23,7 +16,6 @@ import android.os.Environment
 import android.os.Handler
 import android.os.Looper
 import android.provider.MediaStore
-import android.service.controls.templates.ThumbnailTemplate
 import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
@@ -31,26 +23,17 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
-import android.widget.FrameLayout
 import android.widget.HorizontalScrollView
-import android.widget.ImageView
 import android.widget.LinearLayout
-import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
-import android.widget.ToggleButton
 import androidx.activity.result.ActivityResultLauncher
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
-import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.core.util.TypedValueCompat.dpToPx
-import androidx.core.view.isVisible
-import androidx.core.view.marginBottom
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
@@ -65,20 +48,14 @@ class MainLayout(
     private val galleryLauncher: ActivityResultLauncher<Intent>?
 ) {
 
-
-
     private val imageViewManager = ImageViewManager(context)
-
     private val listViewManager = ListViewManager(context, this, imageViewManager)
-
-
     private val mainFrame = ConstraintLayout(context)
     private val topTabBar = ConstraintLayout(context)
     private val galleryBtn = Button(context)
     private val toggleFilterBtn = Button(context)
     private val saveBtn = Button(context)
     private val imageViewFrame = LinearLayout(context)
-
     private val imageView = imageViewManager.getImageView()
 
 //    private val bottomBar = setupBottomBar()
@@ -86,14 +63,10 @@ class MainLayout(
     private val categoryBar = setupCategoryBar()
     //ListViewManager클래스로 RecyclerView 동적구현
     private val editBar = listViewManager.getEditBar()
-
     private val bottomBar = setupBottomBar()
-
     private val coroutineScope = CoroutineScope(Dispatchers.Main)
     private lateinit var progressDialog: Dialog
     private var imageProcessingJob: Job? = null // 이미지 처리 작업을 관리할 Job 변수
-
-
     private var currentMessageView: View? = null // 현재 표시된 메시지 뷰를 참조하기 위한 변수
 
 
@@ -101,18 +74,10 @@ class MainLayout(
 
     //사용자 기기 갤러리 통해서 받아온 이미지 이미지뷰어에 띄우기
     fun setImage(originBitmap: Bitmap, resizedBitmap : Bitmap, thumbnailBitmap: Bitmap) {
-
-
         imageViewManager.originImage = originBitmap
-
-
         imageViewManager.loadGalleryImage(resizedBitmap)
-
-
-
         listViewManager.setCurrentItemImage(thumbnailBitmap)
     }
-
 
 
     init {
@@ -194,13 +159,6 @@ class MainLayout(
         progressDialog = Dialog(context).apply {
             setContentView(R.layout.custom_progress_dialog) // 커스텀 레이아웃 설정
             setCancelable(false) // 뒤로 가기 버튼으로 취소 불가능하도록 설정
-
-//            // 취소 버튼 리스너 설정
-//            val closeButton = findViewById<ImageView>(R.id.closeButton)
-//            closeButton.setOnClickListener {
-//                progressDialog.dismiss()  // 다이얼로그 먼저 닫기
-//                imageProcessingJob?.cancel() // 이미지 처리 작업 취소
-//            }
         }
     }
 
@@ -240,12 +198,15 @@ class MainLayout(
                 // "Roboto Medium" 폰트 스타일 적용
                 typeface = Typeface.create("sans-serif-light", Typeface.NORMAL)
 
-//                val paddingInDp = 8 // dp 단위
-//                val density = context.resources.displayMetrics.density
-//                val paddingInPx = (paddingInDp * density).toInt()
-//                setPadding(paddingInPx, paddingInPx, paddingInPx, paddingInPx)
-
                 setOnClickListener {
+                    // 버튼 클릭 시 배경 색상 변경
+                    setTextColor(Color.BLACK) // 클릭 시 임시로 색상을 변경
+
+                    // Handler를 사용하여 일정 시간 후에 색상을 원래대로 되돌림
+                    Handler(Looper.getMainLooper()).postDelayed({
+                        setTextColor(Color.WHITE) // 원래의 색상으로 변경
+                    }, 300) // 500ms 후에 실행, 이 시간은 필요에 따라 조절 가능
+
                     // 선택된 카테고리의 첫 아이템으로 스크롤하는 로직 등 구현
                     listViewManager.scrollToCategory(category)
                 }
@@ -253,6 +214,7 @@ class MainLayout(
             categoryList.addView(button)
         }
     }
+
 
     private fun setupBottomBar(): ConstraintLayout {
         // bottomBar 레이아웃 생성
@@ -467,27 +429,6 @@ class MainLayout(
             applyTo(mainFrame)
         }
 
-//        ConstraintSet().apply {
-//            clone(mainFrame)
-//
-//            connect(categoryBar.id, ConstraintSet.BOTTOM, editBar.id, ConstraintSet.TOP, 0)
-//            connect(categoryBar.id, ConstraintSet.START, ConstraintSet.PARENT_ID, ConstraintSet.START,0)
-//            connect(categoryBar.id, ConstraintSet.END, ConstraintSet.PARENT_ID, ConstraintSet.END,0)
-//
-//
-//            applyTo(mainFrame)
-//        }
-//
-//        ConstraintSet().apply {
-//            clone(mainFrame)
-//
-//            connect(editBar.id, ConstraintSet.BOTTOM, ConstraintSet.PARENT_ID, ConstraintSet.BOTTOM, 104)
-//            connect(editBar.id, ConstraintSet.START, ConstraintSet.PARENT_ID, ConstraintSet.START,8)
-//            connect(editBar.id, ConstraintSet.END, ConstraintSet.PARENT_ID, ConstraintSet.END, 8)
-//
-//
-//            applyTo(mainFrame)
-//        }
 
         ConstraintSet().apply {
             clone(bottomBar)
@@ -597,41 +538,6 @@ class MainLayout(
                 }
             }
         }
-
-
-        /*
-        saveBtn.setOnClickListener {
-
-            Toast.makeText(context, "saveBtn tapped", Toast.LENGTH_SHORT).show()
-
-            val currentImage : Bitmap = imageViewManager.getCurrentImage()
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                currentImage.let {
-                    saveImageOnAboveAndroidQ(currentImage)
-                    Toast.makeText(context, "이미지 저장이 완료되었습니다.", Toast.LENGTH_SHORT).show()
-                }
-            } else {
-                // Q 버전 이하일 경우. 저장소 권한을 얻어온다.
-                val writePermission = ActivityCompat.checkSelfPermission(context, android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
-
-                if(writePermission == PackageManager.PERMISSION_GRANTED) {
-                    saveImageOnUnderAndroidQ(currentImage)
-                    Toast.makeText(context, "이미지 저장이 완료되었습니다.", Toast.LENGTH_SHORT).show()
-                } else {
-                    val requestExternalStorageCode = 1
-
-                    val permissionStorage = arrayOf(
-                        android.Manifest.permission.READ_EXTERNAL_STORAGE,
-                        android.Manifest.permission.WRITE_EXTERNAL_STORAGE
-                    )
-
-                    ActivityCompat.requestPermissions(context as Activity, permissionStorage, requestExternalStorageCode)
-                }
-            }
-        }
-
-         */
 
 
         toggleFilterBtn.setOnTouchListener { _, event ->
