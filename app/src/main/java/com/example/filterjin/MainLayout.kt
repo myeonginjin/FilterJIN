@@ -48,20 +48,14 @@ class MainLayout(
     private val galleryLauncher: ActivityResultLauncher<Intent>?
 ) {
 
-
-
     private val imageViewManager = ImageViewManager(context)
-
     private val listViewManager = ListViewManager(context, this, imageViewManager)
-
-
     private val mainFrame = ConstraintLayout(context)
     private val topTabBar = ConstraintLayout(context)
     private val galleryBtn = Button(context)
     private val toggleFilterBtn = Button(context)
     private val saveBtn = Button(context)
     private val imageViewFrame = LinearLayout(context)
-
     private val imageView = imageViewManager.getImageView()
 
 //    private val bottomBar = setupBottomBar()
@@ -69,31 +63,19 @@ class MainLayout(
     private val categoryBar = setupCategoryBar()
     //ListViewManager클래스로 RecyclerView 동적구현
     private val editBar = listViewManager.getEditBar()
-
     private val bottomBar = setupBottomBar()
-
     private val coroutineScope = CoroutineScope(Dispatchers.Main)
     private lateinit var progressDialog: Dialog
     private var imageProcessingJob: Job? = null // 이미지 처리 작업을 관리할 Job 변수
-
-
     private var currentMessageView: View? = null // 현재 표시된 메시지 뷰를 참조하기 위한 변수
 
 
     //사용자 기기 갤러리 통해서 받아온 이미지 이미지뷰어에 띄우기
     fun setImage(originBitmap: Bitmap, resizedBitmap : Bitmap, thumbnailBitmap: Bitmap) {
-
-
         imageViewManager.originImage = originBitmap
-
-
         imageViewManager.loadGalleryImage(resizedBitmap)
-
-
-
         listViewManager.setCurrentItemImage(thumbnailBitmap)
     }
-
 
 
     init {
@@ -167,13 +149,6 @@ class MainLayout(
         progressDialog = Dialog(context).apply {
             setContentView(R.layout.custom_progress_dialog) // 커스텀 레이아웃 설정
             setCancelable(false) // 뒤로 가기 버튼으로 취소 불가능하도록 설정
-
-//            // 취소 버튼 리스너 설정
-//            val closeButton = findViewById<ImageView>(R.id.closeButton)
-//            closeButton.setOnClickListener {
-//                progressDialog.dismiss()  // 다이얼로그 먼저 닫기
-//                imageProcessingJob?.cancel() // 이미지 처리 작업 취소
-//            }
         }
     }
 

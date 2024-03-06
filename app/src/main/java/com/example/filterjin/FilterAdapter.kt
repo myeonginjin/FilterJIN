@@ -5,7 +5,6 @@ import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.drawable.ShapeDrawable
 import android.graphics.drawable.shapes.RectShape
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -30,22 +29,14 @@ class FilterAdapter(private var filterItemList: List<FilterItem>):
 
     override fun onBindViewHolder(holder: FilterViewHolder, position: Int) {
         val filterItem = filterItemList[position]
-
-
-        Log.i("testItem","$position")
-
         val roundedBitmap = filterItem.thumbnail
+        val frameLayout = holder.itemView.findViewById<FrameLayout>(R.id.frameLayoutId)
 
         holder.itemImg.setImageBitmap(roundedBitmap)
-
         holder.filterName.text = filterItem.name
-
         // 선택 상태에 따른 ImageView 투명도 조정
         holder.itemImg.alpha = if (filterItem.isSelected) 0.2f else 1.0f
 
-
-
-        val frameLayout = holder.itemView.findViewById<FrameLayout>(R.id.frameLayoutId)
 
         if (filterItem.isSelected) {
             // 선택된 경우 테두리 추가

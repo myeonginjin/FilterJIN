@@ -51,14 +51,9 @@ class FilterFactory (private val context: Context) {
                 e.printStackTrace()
             }
 
-
-
             val assetManager = context.resources.assets
             val inputStream = assetManager.open("defaultItemThumnailImage.png")
-
             val thumbnail : Bitmap = BitmapFactory.decodeStream(inputStream)
-
-
 
             try {
 

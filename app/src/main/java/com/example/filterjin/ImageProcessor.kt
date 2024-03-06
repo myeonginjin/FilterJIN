@@ -122,7 +122,6 @@ object ImageProcessor {
         // R,G,B 각각 값을 올림했을 때 얻게되는 각각의 LUT 픽셀값
         val ceilLutPixel = lutPixels[ceilLutIndex]
 
-
         // 4배 축소된 LUT이미지(63*63*63) 파일로 인해 선형 보간법 적용
         val outPutR = bilinearInterpolation(Color.red(floorLutPixel), Color.red(ceilLutPixel), r - r.toInt())
         val outPutG = bilinearInterpolation(Color.green(floorLutPixel), Color.green(ceilLutPixel), g - g.toInt())
@@ -138,7 +137,6 @@ object ImageProcessor {
 
         index += (blue / 8) * (64 * 64 * 8)
         index += green * 8 * 64
-
         index += (blue % 8) * 64 + red
 
         return index

@@ -66,7 +66,6 @@ class ListViewManager (private val context : Context,  private val mainLayout: M
 
         //리스트가 좌우로 스크롤되도록 지정
         editBar.layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
-
         filterAdapter.itemClickListener = object : FilterAdapter.OnItemClickListener {
 
             //콜백함수 오바라이딩
@@ -84,8 +83,6 @@ class ListViewManager (private val context : Context,  private val mainLayout: M
 
                 // 어댑터 갱신
                 filterAdapter.notifyDataSetChanged()
-
-//                Toast.makeText(context, "${item.name} 클릭함", Toast.LENGTH_SHORT).show()
 
                 // 메소드 실행 전 시간 측정
                 val startTime = System.nanoTime()
