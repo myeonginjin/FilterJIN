@@ -108,6 +108,7 @@ class ListViewManager (private val context : Context,  private val mainLayout: M
         return  editBar
     }
     // Coroutines를 사용하여 비동기 처리
+    @SuppressLint("NotifyDataSetChanged")
     fun setCurrentItemImage(bitmap: Bitmap) {
         // Coroutine 시작
 
@@ -138,8 +139,8 @@ class ListViewManager (private val context : Context,  private val mainLayout: M
             // 메인 스레드로 전환하여 UI 업데이트
             withContext(Dispatchers.Main) {
                 // 어댑터와 리사이클러뷰 갱신
-                filterAdapter.resetFilterSelection()
-                filterAdapter.notifyDataSetChanged()
+                this@ListViewManager.filterAdapter.resetFilterSelection()
+                this@ListViewManager.filterAdapter.notifyDataSetChanged()
 //                mainLayout.showCenteredProgressDialog()
             }
         }
