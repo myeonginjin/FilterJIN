@@ -4,21 +4,12 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.os.Handler
-import android.os.Looper
 import android.util.Log
-import android.view.Gravity
-import android.view.LayoutInflater
 import android.view.ViewGroup
-import android.widget.TextView
-import android.widget.Toast
-import androidx.core.view.marginBottom
-import androidx.core.view.marginTop
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -33,9 +24,6 @@ class ListViewManager (private val context : Context,  private val mainLayout: M
     //어뎁터에 인스턴스 리스트 보내, 뷰 요소로 사용할 수 있도록 만들기
     private val filterAdapter = FilterAdapter(itemList)
 
-    private var toastHandler = Handler(Looper.getMainLooper())
-    private var toastRunnable: Runnable? = null
-    private var toast: Toast? = null
 
     fun getUniqueCategories(): List<String> {
         return filterFactory.getFilterCategoryList().map { it.category }.distinct()
@@ -85,35 +73,6 @@ class ListViewManager (private val context : Context,  private val mainLayout: M
             override fun onItemClick(position: Int) {
 
                 val selectedItem = itemList[position]
-
-                /*
-                toastRunnable?.let { toastHandler.removeCallbacks(it) }
-
-
-                // LayoutInflater를 사용하여 custom_toast_layout 레이아웃을 로드
-                val inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-                val layout = inflater.inflate(R.layout.custom_toast_layout, null)
-
-                // 레이아웃 내의 TextView 찾기 및 설정
-                val text: TextView = layout.findViewById(R.id.toast_text)
-                val category: TextView = layout.findViewById(R.id.toast_category)
-                text.text = selectedItem.name
-                category.text = selectedItem.category
-
-                // 토스트 설정 및 표시
-                toast?.cancel() // 이전 토스트 취소
-                toast = Toast(context).apply {
-                    setGravity(Gravity.CENTER, 0, 0)
-                    duration = Toast.LENGTH_SHORT
-                    view = layout
-                }
-                toast?.show()
-
-                // Runnable을 통해 지정한 시간 후에 Toast 취소
-                toastRunnable = Runnable { toast?.cancel() }
-                // 예: 500ms 후에 토스트 메시지 사라지게 설정
-                toastHandler.postDelayed(toastRunnable!!, 800)
-                */
 
                 mainLayout.showCustomMessage(selectedItem.name , selectedItem.category)
 

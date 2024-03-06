@@ -1,14 +1,8 @@
 package com.example.filterjin
 
 import android.annotation.SuppressLint
-import android.graphics.Bitmap
-import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
-import android.graphics.PorterDuff
-import android.graphics.PorterDuffXfermode
-import android.graphics.Rect
-import android.graphics.RectF
 import android.graphics.drawable.ShapeDrawable
 import android.graphics.drawable.shapes.RectShape
 import android.util.Log
@@ -33,28 +27,6 @@ class FilterAdapter(private var filterItemList: List<FilterItem>):
         val view = LayoutInflater.from(parent.context).inflate(R.layout.filter_item_recycler_view, parent, false)
         return FilterViewHolder(view)
     }
-
-
-//    private fun getRoundedCornerBitmap(bitmap: Bitmap): Bitmap? {
-//        val output = Bitmap.createBitmap(
-//            bitmap.width,
-//            bitmap.height, Bitmap.Config.ARGB_8888
-//        )
-//        val canvas = Canvas(output)
-//        val color = -0xbdbdbe
-//        val paint = Paint()
-//        val rect = Rect(0, 0, bitmap.width, bitmap.height)
-//        val rectF = RectF(rect)
-//        val roundPx = 50f // 테두리 곡률 설정
-//        paint.isAntiAlias = true
-//        canvas.drawARGB(0, 0, 0, 0)
-//        paint.color = color
-//        canvas.drawRoundRect(rectF, roundPx, roundPx, paint)
-//        paint.setXfermode(PorterDuffXfermode(PorterDuff.Mode.SRC_IN))
-//        canvas.drawBitmap(bitmap, rect, rect, paint)
-//        return output
-//    }
-
 
     override fun onBindViewHolder(holder: FilterViewHolder, position: Int) {
         val filterItem = filterItemList[position]
@@ -93,7 +65,7 @@ class FilterAdapter(private var filterItemList: List<FilterItem>):
 
 
         // 선택 상태에 따른 배경색 변경
-//        holder.itemView.isSelected = filterItem.isSelected
+        //holder.itemView.isSelected = filterItem.isSelected
 
         holder.itemView.setOnClickListener {
             val previousIndex = filterItemList.indexOfFirst { it.isSelected }

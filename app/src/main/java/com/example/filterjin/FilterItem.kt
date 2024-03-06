@@ -1,8 +1,6 @@
 package com.example.filterjin
 
 import android.graphics.Bitmap
-import android.media.Image
-import android.widget.ImageView
 
 data class FilterItem(
     val id: Int,

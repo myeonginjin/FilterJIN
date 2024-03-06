@@ -58,25 +58,6 @@ class FilterFactory (private val context: Context) {
 
             var thumbnail : Bitmap = BitmapFactory.decodeStream(inputStream)
 
-//            if (type == "Ratio"){
-//                thumbnail = ImageProcessor.applyRatioFilter(thumbnail, rRatio, gRatio, bRatio)
-//            }
-//            else if(type == "LUT") {
-//                lateinit var lutBitmap: Bitmap
-//                val assetManager = context.resources.assets
-//                val fileName : String = lut
-//
-//                try{
-//                    val inputStreamLUT = assetManager.open(fileName)
-//                    lutBitmap = BitmapFactory.decodeStream(inputStreamLUT)
-//                    val applyLutBitmap = ImageProcessor.applyLutToBitmap(thumbnail , lutBitmap)
-//                    thumbnail = applyLutBitmap
-//
-//                }catch (e : Exception){
-//                    thumbnail = thumbnail
-//                    e.printStackTrace()
-//                }
-//            }
 
 
             try {
