@@ -25,14 +25,14 @@ class FilterFactory (private val context: Context) {
     fun getFilterItemList() : List<FilterItem>{
 
         var  jsonObject :JSONObject
-        var id : Int = 0
-        var name : String = ""
-        var rRatio : Double = 0.0
-        var gRatio : Double = 0.0
-        var bRatio : Double = 0.0
-        var category : String = ""
-        var type : String = ""
-        var lut : String = ""
+        var id = 0
+        var name = ""
+        var rRatio = 0.0
+        var gRatio = 0.0
+        var bRatio = 0.0
+        var category = ""
+        var type = ""
+        var lut = ""
 
 
         for (i in 0 until jsonArray.length()){
@@ -51,33 +51,9 @@ class FilterFactory (private val context: Context) {
                 e.printStackTrace()
             }
 
-
-
             val assetManager = context.resources.assets
             val inputStream = assetManager.open("defaultItemThumnailImage.png")
-
-            var thumbnail : Bitmap = BitmapFactory.decodeStream(inputStream)
-
-//            if (type == "Ratio"){
-//                thumbnail = ImageProcessor.applyRatioFilter(thumbnail, rRatio, gRatio, bRatio)
-//            }
-//            else if(type == "LUT") {
-//                lateinit var lutBitmap: Bitmap
-//                val assetManager = context.resources.assets
-//                val fileName : String = lut
-//
-//                try{
-//                    val inputStreamLUT = assetManager.open(fileName)
-//                    lutBitmap = BitmapFactory.decodeStream(inputStreamLUT)
-//                    val applyLutBitmap = ImageProcessor.applyLutToBitmap(thumbnail , lutBitmap)
-//                    thumbnail = applyLutBitmap
-//
-//                }catch (e : Exception){
-//                    thumbnail = thumbnail
-//                    e.printStackTrace()
-//                }
-//            }
-
+            val thumbnail : Bitmap = BitmapFactory.decodeStream(inputStream)
 
             try {
 
