@@ -25,14 +25,14 @@ class FilterFactory (private val context: Context) {
     fun getFilterItemList() : List<FilterItem>{
 
         var  jsonObject :JSONObject
-        var id : Int = 0
-        var name : String = ""
-        var rRatio : Double = 0.0
-        var gRatio : Double = 0.0
-        var bRatio : Double = 0.0
-        var category : String = ""
-        var type : String = ""
-        var lut : String = ""
+        var id = 0
+        var name = ""
+        var rRatio = 0.0
+        var gRatio = 0.0
+        var bRatio = 0.0
+        var category = ""
+        var type = ""
+        var lut = ""
 
 
         for (i in 0 until jsonArray.length()){
@@ -56,7 +56,7 @@ class FilterFactory (private val context: Context) {
             val assetManager = context.resources.assets
             val inputStream = assetManager.open("defaultItemThumnailImage.png")
 
-            var thumbnail : Bitmap = BitmapFactory.decodeStream(inputStream)
+            val thumbnail : Bitmap = BitmapFactory.decodeStream(inputStream)
 
 
 

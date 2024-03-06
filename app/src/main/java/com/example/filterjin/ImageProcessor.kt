@@ -18,7 +18,7 @@ object ImageProcessor {
         val height: Int = originalBitmap.height
 
         // Get the pixels of the bitmap
-        val pixels: IntArray = IntArray(width * height)
+        val pixels = IntArray(width * height)
         originalBitmap.getPixels(pixels, 0, width, 0, 0, width, height)
 
         // Apply grayscale filter
@@ -87,7 +87,7 @@ object ImageProcessor {
         val floorLutIndex = getLutIndex(floor(r).toInt(), floor(g).toInt(), floor(b).toInt())
 
         // R,G,B 값을 각각 올림했을 때 얻게 되는 LUT의 픽셀 인덱스
-        var ceilLutIndex : Int
+        val ceilLutIndex : Int
 
 
         // 올림한 R,G,B 값 중, LUT이미지 파일의 인덱스 범위(0~63)를 벗어 나는 것이 없는 경우
